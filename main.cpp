@@ -267,6 +267,22 @@ void fit(tree *node, double** dataset, size_t size){
 }
 
 
+// Funcao Visit
+void visit(tree *node) {
+  printf("%f %f %f\n", node->center[0], node->center[1], node->rad);
+}  // funcao que imprime um produto da arvore
+
+void traverse(tree *node) {
+  // funcao que ira imprimir todos os elementos da arvore ordenadamente
+  // (travessia in-order)
+  if (node == NULL){ 
+		return;
+	}
+  traverse(node->L);
+  visit(node);
+  traverse(node->R);
+}
+
 
 int main(){
     double **ret1 = (double **) malloc(5 * sizeof(double *));
@@ -288,6 +304,7 @@ int main(){
     cout<< "center H"<< aux->center[0] <<" "<< aux->center[1] << endl;
     cout<< "radius R" << aux->rad << endl;
 
+		traverse(aux);
 
     return 0;
 }
