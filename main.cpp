@@ -8,6 +8,8 @@
 #include <string>
 #include <stdlib.h>
 
+#include "gen_points.c"
+
 using std::vector;
 using std::pair;
 using std::cout;
@@ -284,8 +286,8 @@ void traverse(tree *node) {
 }
 
 
-int main(){
-    double **ret1 = (double **) malloc(5 * sizeof(double *));
+int main(int argc, char *argv[]){
+  /*  double **ret1 = (double **) malloc(5 * sizeof(double *));
 
     for(size_t i = 0; i < 5; i++) ret1[i] = (double *)malloc(2 * sizeof(double));
 
@@ -295,11 +297,16 @@ int main(){
         ret1[i][0]=data[i][0];
         ret1[i][1]=data[i][1];
     }
+*/
+		int n_dim = atoi(argv[1]);
+		long np = atol(argv[2]);
 
+    double **data = get_points(argc, argv, &n_dim, &np);
+*
 
     tree* aux= new tree;
-
-    fit(aux,ret1,5);
+	
+    fit(aux,data, 5);
 
     cout<< "center H"<< aux->center[0] <<" "<< aux->center[1] << endl;
     cout<< "radius R" << aux->rad << endl;
