@@ -23,7 +23,7 @@ using std::endl;
   */
 struct tree{
     double* center;
-    double rad=0.0;
+    double rad=-1;
     int id;
     tree *L;
     tree *R;
@@ -37,6 +37,7 @@ struct pair_int{
 
 
 size_t n_dim;
+size_t id=0;
 
 
 double eucl(double *aux1, double *aux2){
@@ -166,8 +167,7 @@ struct L_R_ret{
 };
 
 L_R_ret L_R(double ** data,double ** orthg,double* center,size_t data_size){
-    //Explicaçao, numero par de pontos-> mediana "artificial" size/2 corresponde a separação equilibrada dos pontos
-    // numero impar de pontos -> mediana é um ponto-> tem que se alocar int(size/2) pontos, utilizando ponto da mediana como centro
+
 
     double **ret1 = (double **) malloc(data_size * sizeof(double *));
 
@@ -180,10 +180,6 @@ L_R_ret L_R(double ** data,double ** orthg,double* center,size_t data_size){
     int aux2=0;
 
     for(size_t i=0;i<data_size;i++){
-
-        if(orthg[i][0]==center[0]){
-        continue;
-        }
 
         if(orthg[i][0]<center[0]){
 
@@ -227,18 +223,22 @@ double rad(double** data, double* center,size_t data_size){
 }
 
 
-void fit(tree *node, double** dataset, size_t size, int id){
+void fit(tree *node, double** dataset, size_t size){
+
+    node->id=id;
+    id++;
     if(size<=1){
         node->center=dataset[0];
         node->rad=0.0;
-        node->id=-1;
+        node->L=new tree;
+        node->R= new tree;
+        node->L->id=-1;
+        node->R->id=-1;
     }
     else{
 
-    node->id=id;
+
     pair_int a_b=far_away(dataset, size);
-
-
 
     double **orth_aux = orth(dataset, a_b, size);
 
@@ -250,13 +250,14 @@ void fit(tree *node, double** dataset, size_t size, int id){
 
 
     L_R_ret L_R_aux= L_R(dataset,orth_aux,node->center,size);
+
     free(dataset);
     free(orth_aux);
     node->L= new tree;
 
-    fit(node->L,L_R_aux.first,L_R_aux.first_size,id+1);
+    fit(node->L,L_R_aux.first,L_R_aux.first_size);
     node->R= new tree;
-    fit(node->R,L_R_aux.second,L_R_aux.second_size,id+1);
+    fit(node->R,L_R_aux.second,L_R_aux.second_size);
 
 }
 
@@ -266,37 +267,45 @@ void fit(tree *node, double** dataset, size_t size, int id){
 // Funcao Visit
 void visit(tree *node) {
   cout<<node->id << " "<<node->L->id <<" "<<node->R->id << " "<< node->rad <<" ";
-  for(int i=0; i<n_dim;i++){
+  for(int i=0; i<n_dim-1;i++){
+
       cout<<node->center[i]<<" ";
   }
-  cout<< endl;
+  cout<<node->center[n_dim-1] << endl;
 }  // funcao que imprime um produto da arvore
 
 void traverse(tree *node) {
   // funcao que ira imprimir todos os elementos da arvore ordenadamente
   // (travessia in-order)
-  if (node->rad == 0.0){
+  if (node->rad == -1){
         return;
     }
-  traverse(node->L);
+  if(node->rad ==0.0){
+      visit(node);
+  }
+  else{
+      traverse(node->L);
 
-  visit(node);
+      visit(node);
 
-  traverse(node->R);
+      traverse(node->R);
+
+  }
+
 }
 
 
 int main(int argc, char *argv[]){
-     int n_dim_aux = atoi(argv[1]);
-     long np = atol(argv[2]);
+    int n_dim_aux = atoi(argv[1]);
+    long np = atol(argv[2]);
 
     double **data = get_points(argc, argv, &n_dim_aux, &np);
     n_dim=(size_t)n_dim_aux;
 
     tree* aux= new tree;
 
-    fit(aux,data, np,0);
-
+    fit(aux,data, np);
+    cout<<n_dim_aux<<" "<<id<< endl;
     traverse(aux);
     return 0;
 }
