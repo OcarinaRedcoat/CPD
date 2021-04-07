@@ -11,7 +11,6 @@
 #include "gen_points.c"
 
 using std::vector;
-using std::pair;
 using std::cout;
 using std::endl;
 
@@ -24,10 +23,17 @@ using std::endl;
   */
 struct tree{
     double* center;
-    double rad=0;
+    double rad=0.0;
+    int id;
     tree *L;
     tree *R;
 };
+
+struct pair_int{
+    int first;
+    int second;
+};
+
 
 
 size_t n_dim;
@@ -75,19 +81,19 @@ double * mult( double aux1, double *aux2){
     return arr;
 }
 
-double ** orth(double **dataset, pair< double *, double* > a_b, size_t data_size){
+double ** orth(double **dataset, pair_int a_b, size_t data_size){
 
     double **ret = (double **) malloc(data_size * sizeof(double *));
     for(size_t i = 0; i < data_size; i++) ret[i] = (double *)malloc(n_dim * sizeof(double));
 
     double *b_a = (double *) malloc(n_dim * sizeof(double));
 
-    b_a=sub(a_b.second,a_b.first);
+    b_a=sub(dataset[a_b.second],dataset[a_b.first]);
 
     double inner_b_a=inner(b_a,b_a);
 
     for(size_t i=0;i < data_size ;i++){
-        ret[i]= add(mult((inner( sub(dataset[i],a_b.first) ,b_a )/ inner_b_a),b_a), a_b.first);
+        ret[i]= add(mult((inner( sub(dataset[i],dataset[a_b.first]) ,b_a )/ inner_b_a),b_a),dataset[a_b.first]);
 
         // n sei se perferem melhorar como isto está escrito
     }
@@ -95,50 +101,37 @@ double ** orth(double **dataset, pair< double *, double* > a_b, size_t data_size
 
 }
 
-pair< double*, double* > far_away(double **data, size_t size){
+
+pair_int far_away(double **data, size_t size){
     //metedo descrito no enunciado
-    double *a = (double *) malloc(n_dim * sizeof(double));
-    double *b = (double *) malloc(n_dim * sizeof(double));
+
     double aux= 0;
+    int a=0;
     for(size_t i=1;i<size;i++){
         double auxx=eucl(data[0],data[i]);
             if(auxx>aux){
                 aux=auxx;
-                a=data[i];
+                a=i;
             }
     }
+    int b=0;
     aux=0;
-    for(size_t j=0;j<size;j++){
+        for(size_t j=0;j<size;j++){
 
-        double auxx=eucl(a,data[j]);
+        double auxx=eucl(data[a],data[j]);
             if(auxx>aux){
                 aux=auxx;
-                b=data[j];
+                b=j;
             }
     }
-    return std::make_pair(a,b);
-}
-
-
-/*
-pair< double*, double* > far_away(double **data, size_t size){
-
-    pair< double*, double*> ret;
-    double aux= 0;
-
-    for(size_t i=0; i < size; i++){
-        cout<< i << endl;
-        for(size_t j=i+1; j < size; j++){
-            double auxx=eucl(data[i],data[j]);
-            if(auxx>aux){
-                aux=auxx;
-                ret=std::make_pair(data[i],data[j]);
-            }
-        }
-    }
+    pair_int ret;
+    ret.first=a;
+    ret.second=b;
     return ret;
 }
-*/
+
+
+
 int comp(const void *a, const void *b){ // Não está a entrar aqui ???
 // n sei se existe uma malhor forma de fazer isto
 
@@ -234,14 +227,16 @@ double rad(double** data, double* center,size_t data_size){
 }
 
 
-void fit(tree *node, double** dataset, size_t size){
+void fit(tree *node, double** dataset, size_t size, int id){
     if(size<=1){
         node->center=dataset[0];
         node->rad=0.0;
+        node->id=-1;
     }
     else{
 
-    pair< double * , double* > a_b=far_away(dataset, size);
+    node->id=id;
+    pair_int a_b=far_away(dataset, size);
 
 
 
@@ -259,10 +254,10 @@ void fit(tree *node, double** dataset, size_t size){
     free(orth_aux);
     node->L= new tree;
 
-    fit(node->L,L_R_aux.first,L_R_aux.first_size);
-
+    fit(node->L,L_R_aux.first,L_R_aux.first_size,id+1);
     node->R= new tree;
-    fit(node->R,L_R_aux.second,L_R_aux.second_size);
+    fit(node->R,L_R_aux.second,L_R_aux.second_size,id+1);
+
 }
 
 }
@@ -270,7 +265,11 @@ void fit(tree *node, double** dataset, size_t size){
 
 // Funcao Visit
 void visit(tree *node) {
-  cout<< node->rad << endl;
+  cout<<node->id << " "<<node->L->id <<" "<<node->R->id << " "<< node->rad <<" ";
+  for(int i=0; i<n_dim;i++){
+      cout<<node->center[i]<<" ";
+  }
+  cout<< endl;
 }  // funcao que imprime um produto da arvore
 
 void traverse(tree *node) {
@@ -296,7 +295,7 @@ int main(int argc, char *argv[]){
 
     tree* aux= new tree;
 
-    fit(aux,data, np);
+    fit(aux,data, np,0);
 
     traverse(aux);
     return 0;
