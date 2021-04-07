@@ -1,7 +1,10 @@
 # CPD;
-arranjar forma de n ter de fazer 2 orth;
 
-melhorar forma de gestão de memoria;
+corrigir alocação de memoria no l_r
+
+arranjar forma de n ter de fazer 2 orth(ver função fit);
+
+melhorar forma de gestão de memoria nas operações de aritmetica;
 
 paralizar o s loops de matematica ;
 paralelizar a tree;
