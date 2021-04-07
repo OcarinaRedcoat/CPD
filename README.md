@@ -1,11 +1,11 @@
-# CPD
-apagar funções desnecessarias;
+#cpd
 
-acabar orthogonal, mediana , sets left and rigth e separar;
+arrajar forma de fazer 2 copias do ortogonal
 
 limpar memoria;
 
 paralizar o s loops de matematica 
 
-paralizar o sort e a tree.
+paralizar a tree.
+(paralizar o sort)
 
