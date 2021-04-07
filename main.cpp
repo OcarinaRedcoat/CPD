@@ -85,6 +85,8 @@ double * mult( double aux1, double *aux2){
 double ** orth(double **dataset, pair_int a_b, size_t data_size){
 
     double **ret = (double **) malloc(data_size * sizeof(double *));
+
+
     for(size_t i = 0; i < data_size; i++) ret[i] = (double *)malloc(n_dim * sizeof(double));
 
     double *b_a = (double *) malloc(n_dim * sizeof(double));
@@ -94,10 +96,13 @@ double ** orth(double **dataset, pair_int a_b, size_t data_size){
     double inner_b_a=inner(b_a,b_a);
 
     for(size_t i=0;i < data_size ;i++){
+
+
         ret[i]= add(mult((inner( sub(dataset[i],dataset[a_b.first]) ,b_a )/ inner_b_a),b_a),dataset[a_b.first]);
 
         // n sei se perferem melhorar como isto está escrito
     }
+
     return ret;
 
 }
@@ -128,6 +133,7 @@ pair_int far_away(double **data, size_t size){
     pair_int ret;
     ret.first=a;
     ret.second=b;
+
     return ret;
 }
 
@@ -138,14 +144,21 @@ int comp(const void *a, const void *b){ // Não está a entrar aqui ???
 
     double *aa = *(double * const *)a;
     double *bb = *(double * const *)b;
-    return (aa[0] > bb[0]);
+    if (aa[0] > bb[0])
+        return 1;
+      else if (aa[0] < bb[0])
+        return -1;
+      else
+        return 0;
 }
 
 double* median_center( double **orth,size_t size){
 
 
         // n sei se isto modifica a ordem
-    std::qsort(orth, size, sizeof(*orth), comp);
+    qsort(orth, size, sizeof(*orth), comp);
+
+
 
     if (size%2 == 0){
         double *ret = (double *) malloc(n_dim * sizeof(double));
@@ -173,7 +186,8 @@ L_R_ret L_R(double ** data,double ** orthg,double* center,size_t data_size){
 
     for(size_t i = 0; i < data_size; i++) ret1[i] = (double *)malloc(n_dim * sizeof(double));
 
-    double **ret2 = (double **) malloc(data_size * sizeof(double *));
+
+    double **ret2 = (double **) malloc((data_size) * sizeof(double *));
     for(size_t i = 0; i < data_size; i++) ret2[i] = (double *)malloc(n_dim * sizeof(double));
 
     int aux1=0;
@@ -205,6 +219,7 @@ L_R_ret L_R(double ** data,double ** orthg,double* center,size_t data_size){
     ret.second=(ret2);
     ret.first_size=(aux1);
     ret.second_size=(aux2);
+    cout<< ret.first_size << " "<< ret.second_size << endl;
 
     return ret;
 
@@ -301,8 +316,7 @@ int main(int argc, char *argv[]){
 
     double **data = get_points(argc, argv, &n_dim_aux, &np);
     n_dim=(size_t)n_dim_aux;
-
-    tree* aux= new tree;
+    tree* aux= new tree;   
 
     fit(aux,data, np);
     cout<<n_dim_aux<<" "<<id<< endl;
