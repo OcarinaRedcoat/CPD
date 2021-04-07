@@ -8,28 +8,46 @@
 #include <string>
 #include <stdlib.h>
 
+#include "gen_points.c"
+
 using std::vector;
-using std::pair;
 using std::cout;
 using std::endl;
 
+/*
+  falta:
+  limpar memoria
+  substituir no void a 2 chamada do orth por uma copia
+  melhorar alguma das alocaçºoes de memoria que fiz
+  testar com o codigo do professor
+  */
 struct tree{
     double* center;
-    double rad;
+    double rad=-1;
+    int id;
     tree *L;
     tree *R;
 };
 
-size_t n_dim=2;
+struct pair_int{
+    int first;
+    int second;
+};
 
 
 
-double eucl(const double *aux1, const double *aux2){
+size_t n_dim;
+size_t id=0;
+
+
+double eucl(double *aux1, double *aux2){
     double ret=0.0;
+    double aux=0.0;
     for(size_t i=0; i < n_dim; i++){
-        ret= ret+ pow(aux1[i]-aux2[i],2);
+        aux=aux1[i]-aux2[i];
+        ret= ret+ aux*aux;
     }
-    return pow(ret,0.5);
+    return ret;
 }
 
 double inner(double *a, double *b){
@@ -40,7 +58,7 @@ double inner(double *a, double *b){
     return ret;
 }
 
-double * add(const double *aux1,const double *aux2){
+double * add( double *aux1, double *aux2){
     double *arr = (double *) malloc(n_dim * sizeof(double));
     for(size_t i=0;i < n_dim; i++){
         arr[i]=aux1[i]+aux2[i];
@@ -48,7 +66,7 @@ double * add(const double *aux1,const double *aux2){
     return arr;
 }
 
-double * sub(const double *aux1,const double *aux2){
+double * sub( double *aux1, double *aux2){
     double *arr = (double *) malloc(n_dim * sizeof(double));
     for(size_t i=0;i < n_dim; i++){
         arr[i]=aux1[i]-aux2[i];
@@ -64,106 +82,88 @@ double * mult( double aux1, double *aux2){
     return arr;
 }
 
-double ** orth(double **dataset, pair< double *, double* > a_b, size_t data_size){
+double ** orth(double **dataset, pair_int a_b, size_t data_size){
 
     double **ret = (double **) malloc(data_size * sizeof(double *));
+
+
     for(size_t i = 0; i < data_size; i++) ret[i] = (double *)malloc(n_dim * sizeof(double));
 
     double *b_a = (double *) malloc(n_dim * sizeof(double));
 
-    b_a=sub(a_b.second,a_b.first);
+    b_a=sub(dataset[a_b.second],dataset[a_b.first]);
 
     double inner_b_a=inner(b_a,b_a);
 
     for(size_t i=0;i < data_size ;i++){
-        ret[i]= add(mult((inner( sub(dataset[i],a_b.first) ,b_a )/ inner_b_a),b_a), a_b.first);
+
+
+        ret[i]= add(mult((inner( sub(dataset[i],dataset[a_b.first]) ,b_a )/ inner_b_a),b_a),dataset[a_b.first]);
 
         // n sei se perferem melhorar como isto está escrito
     }
-    return ret;
-
-}
-
-double *orth_1d(double *dataset, pair< double *, double* > a_b){
-
-    double *b_a = (double *) malloc(n_dim * sizeof(double));
-    double *ret = (double *) malloc(n_dim * sizeof(double));
-
-    b_a=sub(a_b.second,a_b.first);
-
-    double inner_b_a=inner(b_a,b_a);
-
-    ret= add(mult((inner( sub(dataset,a_b.first) ,b_a )/ inner_b_a),b_a), a_b.first);
 
     return ret;
 
 }
-/*
-pair< double*, double* > far_away(double **data, size_t size){
 
+
+pair_int far_away(double **data, size_t size){
     //metedo descrito no enunciado
-    double *a = (double *) malloc(n_dim * sizeof(double));
-    double *b = (double *) malloc(n_dim * sizeof(double));
-    double aux= 0;
 
+    double aux= 0;
+    int a=0;
     for(size_t i=1;i<size;i++){
         double auxx=eucl(data[0],data[i]);
             if(auxx>aux){
                 aux=auxx;
-                a=data[i];
-
+                a=i;
             }
-
     }
+    int b=0;
     aux=0;
-    for(size_t j=0;j<size;j++){
-        double auxx=eucl(a,data[j]);
+        for(size_t j=0;j<size;j++){
+
+        double auxx=eucl(data[a],data[j]);
             if(auxx>aux){
                 aux=auxx;
-                b=data[j];
-
+                b=j;
             }
-
     }
+    pair_int ret;
+    ret.first=a;
+    ret.second=b;
 
-    return std::make_pair(a,b);
-}
-*/
-pair< double*, double* > far_away(double **data, size_t size){
-
-    pair< double*, double*> ret;
-    double aux= 0;
-
-    for(size_t i=0; i < size; i++){
-        for(size_t j=i+1; j < size; j++){
-            double auxx=eucl(data[i],data[j]);
-            if(auxx>aux){
-                aux=auxx;
-                ret=std::make_pair(data[i],data[j]);
-            }
-        }
-    }
     return ret;
 }
+
+
 
 int comp(const void *a, const void *b){ // Não está a entrar aqui ???
 // n sei se existe uma malhor forma de fazer isto
 
     double *aa = *(double * const *)a;
     double *bb = *(double * const *)b;
-    return (aa[0] > bb[0]);
+    if (aa[0] > bb[0])
+        return 1;
+      else if (aa[0] < bb[0])
+        return -1;
+      else
+        return 0;
 }
-
-
 
 double* median_center( double **orth,size_t size){
 
-    std::qsort(orth, size, sizeof(*orth), comp);
+
+        // n sei se isto modifica a ordem
+    qsort(orth, size, sizeof(*orth), comp);
+
+
 
     if (size%2 == 0){
         double *ret = (double *) malloc(n_dim * sizeof(double));
         for (size_t i = 0; i < n_dim; i++){
-            ret[i]= orth[size/2][i] + orth[size/2-1][i]; // acho que e a media nao a soma mas not sure
+            ret[i]= (orth[size/2][i] + orth[size/2-1][i])/2;
 
         }
         return ret;
@@ -171,45 +171,57 @@ double* median_center( double **orth,size_t size){
         return orth[size/2];
     }
 }
-pair< double**, double** > L_R(double ** data,double ** orthg,double* center,pair< double *, double* > a_b,size_t data_size){
-    //Explicaçao, numero par de pontos-> mediana "artificial" size/2 corresponde a separação equilibrada dos pontos
-    // numero impar de pontos -> mediana é um ponto-> tem que se alocar int(size/2) pontos, utilizando ponto da mediana como centro
+
+struct L_R_ret{
+    double** first;
+    double** second;
+    size_t first_size;
+    size_t second_size;
+};
+
+L_R_ret L_R(double ** data,double ** orthg,double* center,size_t data_size){
+
 
     double **ret1 = (double **) malloc(data_size * sizeof(double *));
 
-    for(size_t i = 0; i < data_size/2; i++) ret1[i] = (double *)malloc(n_dim * sizeof(double));
-
-    double **ret2 = (double **) malloc(data_size * sizeof(double *));
-    for(size_t i = 0; i < data_size/2; i++) ret2[i] = (double *)malloc(n_dim * sizeof(double));
+    for(size_t i = 0; i < data_size; i++) ret1[i] = (double *)malloc(n_dim * sizeof(double));
 
 
-    double *center_aux = (double *) malloc(n_dim * sizeof(double));
-
-    center_aux=orth_1d(center,a_b);
+    double **ret2 = (double **) malloc((data_size) * sizeof(double *));
+    for(size_t i = 0; i < data_size; i++) ret2[i] = (double *)malloc(n_dim * sizeof(double));
 
     int aux1=0;
     int aux2=0;
-    cout<< center_aux[0]<< endl;
-    cout<< center_aux[1] << endl;
+
     for(size_t i=0;i<data_size;i++){
 
-    // isto deve estar mal
-        if(orthg[i]==center_aux){
+        if(orthg[i][0]<center[0]){
 
-            continue;
-        }
-        if(orthg[i][0]<center_aux[0]){
-
-            ret2[aux1]=data[i];
+            for(size_t j=0; j<n_dim;j++){
+                ret1[aux1][j]=data[i][j];
+            }
             aux1++;
         }
 
         else{
-            ret2[aux2]=data[i];
+            for(size_t j=0; j<n_dim;j++){
+                ret2[aux2][j]=data[i][j];
+
+            }
+
+
             aux2++;
         }
     }
-    return std::make_pair(ret1,ret2);
+
+    L_R_ret ret;
+    ret.first=(ret1);
+    ret.second=(ret2);
+    ret.first_size=(aux1);
+    ret.second_size=(aux2);
+    cout<< ret.first_size << " "<< ret.second_size << endl;
+
+    return ret;
 
 
 }
@@ -222,58 +234,92 @@ double rad(double** data, double* center,size_t data_size){
         }
 
     }
-    return ret;
+    return pow(ret,0.5);
 }
 
 
 void fit(tree *node, double** dataset, size_t size){
+
+    node->id=id;
+    id++;
     if(size<=1){
         node->center=dataset[0];
         node->rad=0.0;
+        node->L=new tree;
+        node->R= new tree;
+        node->L->id=-1;
+        node->R->id=-1;
     }
     else{
 
-    pair< double * , double* > a_b=far_away(dataset, size);
+
+    pair_int a_b=far_away(dataset, size);
 
     double **orth_aux = orth(dataset, a_b, size);
 
-    node->center=median_center(orth_aux,size);
 
-    printf("Median_center output: (%f , %f)\n", node->center[0], node->center[1]);
+    node->center=median_center(orth(dataset, a_b, size),size);
+
 
     node->rad=rad(dataset,node->center,size);
 
-    pair<double**,double**> L_R_aux= L_R(dataset,orth_aux,node->center,a_b,size);
 
+    L_R_ret L_R_aux= L_R(dataset,orth_aux,node->center,size);
+
+    free(dataset);
+    free(orth_aux);
     node->L= new tree;
-    fit(node->L, L_R_aux.first, size/2);
 
+    fit(node->L,L_R_aux.first,L_R_aux.first_size);
     node->R= new tree;
-    fit(node->R,L_R_aux.second,size/2);
-}
+    fit(node->R,L_R_aux.second,L_R_aux.second_size);
 
 }
 
+}
 
 
-int main(){
-    double **ret1 = (double **) malloc(5 * sizeof(double *));
+// Funcao Visit
+void visit(tree *node) {
+  cout<<node->id << " "<<node->L->id <<" "<<node->R->id << " "<< node->rad <<" ";
+  for(int i=0; i<n_dim-1;i++){
 
-    for(size_t i = 0; i < 5; i++) ret1[i] = (double *)malloc(2 * sizeof(double));
+      cout<<node->center[i]<<" ";
+  }
+  cout<<node->center[n_dim-1] << endl;
+}  // funcao que imprime um produto da arvore
 
-    double data[5][2]={{7.8,8.0},{8.4,3.9},{9.1,2.0},{2.8,5.5},{3.4,7.7} };
-
-    for(size_t i=0;i<5;i++){
-        ret1[i][0]=data[i][0];
-        ret1[i][1]=data[i][1];
+void traverse(tree *node) {
+  // funcao que ira imprimir todos os elementos da arvore ordenadamente
+  // (travessia in-order)
+  if (node->rad == -1){
+        return;
     }
-    tree* aux= new tree;
+  if(node->rad ==0.0){
+      visit(node);
+  }
+  else{
+      traverse(node->L);
 
-    fit(aux,ret1,5);
+      visit(node);
 
-    cout<< "center H"<< aux->center[0] <<" "<< aux->center[1] << endl;
-    cout<< "radius R" << aux->rad << endl;
+      traverse(node->R);
+
+  }
+
+}
 
 
+int main(int argc, char *argv[]){
+    int n_dim_aux = atoi(argv[1]);
+    long np = atol(argv[2]);
+
+    double **data = get_points(argc, argv, &n_dim_aux, &np);
+    n_dim=(size_t)n_dim_aux;
+    tree* aux= new tree;   
+
+    fit(aux,data, np);
+    cout<<n_dim_aux<<" "<<id<< endl;
+    traverse(aux);
     return 0;
 }
