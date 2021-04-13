@@ -1,5 +1,4 @@
 
-limapr memoria;
 
 optimizar codigo;
 
