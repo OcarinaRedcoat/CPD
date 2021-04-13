@@ -255,7 +255,7 @@ void fit(tree *node, double** dataset, long size){
     pair_int* a_b=far_away(dataset, size);
 
     double **orth_aux = orth(dataset, a_b, size);
-    delete a_b;
+    free(a_b);
 
     node->center=median_center(orth_aux,size);
 
