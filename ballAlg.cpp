@@ -1,4 +1,3 @@
-
 #include <math.h>
 
 #include <stdlib.h>
@@ -49,53 +48,51 @@ double inner(double *a, double *b){
     return ret;
 }
 
-double * add( double *aux1, double *aux2){
-    double *arr = (double *) malloc(n_dim * sizeof(double));
-    for(long i=0;i < n_dim; i++){
-        arr[i]=aux1[i]+aux2[i];
-    }
-    return arr;
-}
-
-double * sub( double *aux1, double *aux2){
-    double *arr = (double *) malloc(n_dim * sizeof(double));
-    for(long i=0;i < n_dim; i++){
-        arr[i]=aux1[i]-aux2[i];
-    }
-    return arr;
-}
-
-double * mult( double aux1, double *aux2){
-    double *arr = (double *) malloc(n_dim * sizeof(double));
-    for(long i=0;i < n_dim; i++){
-        arr[i]=aux1*aux2[i];
-    }
-    return arr;
-}
-
-double ** orth(double **dataset, pair_int a_b, long data_size){
+double ** orth(double **dataset, pair_int& a_b, long data_size){
 
     double **ret = (double **) malloc(data_size * sizeof(double *));
 
 
     for(long i = 0; i < data_size; i++) ret[i] = (double *)malloc(n_dim * sizeof(double));
 
-    double *b_a = (double *) malloc(n_dim * sizeof(double));
+    double b_a[n_dim];
 
-    b_a=sub(dataset[a_b.second],dataset[a_b.first]);
+    double sub_aux[n_dim];
+    //(b-a)
+
+
+    for(long j=0;j<n_dim;j++){
+        b_a[j]=dataset[a_b.second][j]-dataset[a_b.first][j];
+    }
+
+
+    //(b-a).(b-a)
 
     double inner_b_a=inner(b_a,b_a);
 
+    double aux;
+
     for(long i=0;i < data_size ;i++){
 
+        //(p-a)
+        for(long j=0;j<n_dim;j++){
+            sub_aux[j]=dataset[i][j]-dataset[a_b.first][j];
+        }
 
-        ret[i]= add(mult((inner( sub(dataset[i],dataset[a_b.first]) ,b_a )/ inner_b_a),b_a),dataset[a_b.first]);
+        aux=inner(sub_aux,b_a)/inner_b_a;
+
+        // (p-a).(b-a)/(b-a).(b-a) *(b-a) + a
+        for(long j=0;j<n_dim;j++){
+            ret[i][j]=  aux        *         b_a[j]    +      dataset[a_b.first][j];
+        }
+
 
     }
 
     return ret;
 
 }
+
 
 
 pair_int far_away(double **data, long size){
@@ -294,14 +291,22 @@ void traverse(tree *node) {
 
 
 int main(int argc, char *argv[]){
-    int n_dim_aux = atoi(argv[1]);
-    long np = atol(argv[2]);
-
-    double **data = get_points(argc, argv, &n_dim_aux, &np);
+    int n_dim_aux =2;
+    long np = 5;
     n_dim=n_dim_aux;
-    tree* aux= new tree;
+    double** ret1 = (double** ) malloc(5 * sizeof(double *));
 
-    fit(aux,data, np);
+        for(size_t i = 0; i < 5; i++) ret1[i] = (double *)malloc(2 * sizeof(double));
+
+        double data[5][2]={{7.8,8.0},{8.4,3.9},{9.1,2.0},{2.8,5.5},{3.4,7.7} };
+
+        for(size_t i=0;i<5;i++){
+            ret1[i][0]=data[i][0];
+            ret1[i][1]=data[i][1];
+        }
+        tree* aux= new tree;
+
+        fit(aux,ret1,np);
 
     printf("%d %ld\n",n_dim_aux,id);
 
