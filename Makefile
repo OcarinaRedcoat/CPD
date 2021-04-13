@@ -13,6 +13,6 @@ clean:
 	@echo 
 	@echo ----  Cleaning project ...  ----
 	@echo 
-	rm -f $(TARGET) ./tests/*.my.out ./tests/*.diff
+	rm -f $(TARGET) 
 	@echo
 	@echo ----  Very nice!  ----
