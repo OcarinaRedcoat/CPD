@@ -216,7 +216,7 @@ struct L_R_ret* L_R(double ** data,double ** orthg,double* center,long data_size
 
     free(data);
 
-    struct L_R_ret* ret=(L_R_ret*)malloc(sizeof (L_R_ret));
+    struct L_R_ret* ret=(struct L_R_ret*)malloc(sizeof (struct L_R_ret));
     ret->first=(ret1);
     ret->second=(ret2);
     ret->first_size=aux1;
@@ -265,13 +265,21 @@ void fit(struct tree *node, double** dataset, long size){
 
     struct L_R_ret* L_R_aux= L_R(dataset,orth_aux,node->center,size);
 
+
     for(long i = 0; i < size; i++) free(orth_aux[i]);
     free(orth_aux);
 
     node->L=(struct tree*) malloc(sizeof (struct tree));
+
     fit(node->L,L_R_aux->first,L_R_aux->first_size);
+
     node->R=(struct tree*) malloc(sizeof (struct tree));
+
     fit(node->R,L_R_aux->second,L_R_aux->second_size);
+
+    free(L_R_aux->first);
+    free(L_R_aux->second);
+    free(L_R_aux);
 
 }
 
