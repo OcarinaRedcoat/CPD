@@ -1,7 +1,8 @@
-
 #include <math.h>
 
 #include <stdlib.h>
+
+#include <omp.h>
 
 #include "gen_points.c"
 
@@ -16,8 +17,8 @@ struct tree{
     double* center;
     double rad;
     int id;
-    tree *L;
-    tree *R;
+    struct tree *L;
+    struct tree *R;
 };
 
 struct pair_int{
@@ -34,6 +35,7 @@ long id=0;
 double eucl(double *aux1, double *aux2){
     double ret=0.0;
     double aux=0.0;
+
     for(long i=0; i < n_dim; i++){
         aux=aux1[i]-aux2[i];
         ret= ret+ aux*aux;
@@ -49,47 +51,44 @@ double inner(double *a, double *b){
     return ret;
 }
 
-double * add( double *aux1, double *aux2){
-    double *arr = (double *) malloc(n_dim * sizeof(double));
-    for(long i=0;i < n_dim; i++){
-        arr[i]=aux1[i]+aux2[i];
-    }
-    return arr;
-}
-
-double * sub( double *aux1, double *aux2){
-    double *arr = (double *) malloc(n_dim * sizeof(double));
-    for(long i=0;i < n_dim; i++){
-        arr[i]=aux1[i]-aux2[i];
-    }
-    return arr;
-}
-
-double * mult( double aux1, double *aux2){
-    double *arr = (double *) malloc(n_dim * sizeof(double));
-    for(long i=0;i < n_dim; i++){
-        arr[i]=aux1*aux2[i];
-    }
-    return arr;
-}
-
-double ** orth(double **dataset, pair_int a_b, long data_size){
+double ** orth(double **dataset,struct pair_int* a_b, long data_size){
 
     double **ret = (double **) malloc(data_size * sizeof(double *));
 
 
     for(long i = 0; i < data_size; i++) ret[i] = (double *)malloc(n_dim * sizeof(double));
 
-    double *b_a = (double *) malloc(n_dim * sizeof(double));
+    double b_a[n_dim];
 
-    b_a=sub(dataset[a_b.second],dataset[a_b.first]);
+    double sub_aux[n_dim];
+    //(b-a)
+
+
+    for(long j=0;j<n_dim;j++){
+        b_a[j]=dataset[a_b->second][j]-dataset[a_b->first][j];
+    }
+
+
+    //(b-a).(b-a)
 
     double inner_b_a=inner(b_a,b_a);
 
+    double aux;
+
     for(long i=0;i < data_size ;i++){
 
+        //(p-a)
+        for(long j=0;j<n_dim;j++){
+            sub_aux[j]=dataset[i][j]-dataset[a_b->first][j];
+        }
 
-        ret[i]= add(mult((inner( sub(dataset[i],dataset[a_b.first]) ,b_a )/ inner_b_a),b_a),dataset[a_b.first]);
+        aux=inner(sub_aux,b_a)/inner_b_a;
+
+        // (p-a).(b-a)/(b-a).(b-a) *(b-a) + a
+        for(long j=0;j<n_dim;j++){
+            ret[i][j]=  aux        *         b_a[j]    +      dataset[a_b->first][j];
+        }
+
 
     }
 
@@ -98,7 +97,8 @@ double ** orth(double **dataset, pair_int a_b, long data_size){
 }
 
 
-pair_int far_away(double **data, long size){
+
+struct pair_int* far_away(double **data, long size){
     //metedo descrito no enunciado
 
     double aux= 0;
@@ -120,9 +120,9 @@ pair_int far_away(double **data, long size){
                 b=j;
             }
     }
-    pair_int ret;
-    ret.first=a;
-    ret.second=b;
+    struct pair_int* ret=(struct pair_int*) malloc(sizeof(struct pair_int));
+    ret->first=a;
+    ret->second=b;
 
     return ret;
 }
@@ -142,24 +142,41 @@ int comp(const void *a, const void *b){ // Não está a entrar aqui ???
         return 0;
 }
 
-double* median_center( double **orth,long size){
+double* median_center( double **orth_aux,long size){
+
+
+    double **orth = (double **) malloc(size * sizeof(double *));
+    for(long i = 0; i < size; i++) orth[i] = (double *)malloc(n_dim * sizeof(double));
+
+    for(long i=0;i<size;i++){
+        for(long j=0;j<n_dim;j++){
+            orth[i][j]=orth_aux[i][j];
+        }
+    }
 
 
         // n sei se isto modifica a ordem
     qsort(orth, size, sizeof(*orth), comp);
 
-
+    double *ret = (double *) malloc(n_dim * sizeof(double));
 
     if (size%2 == 0){
-        double *ret = (double *) malloc(n_dim * sizeof(double));
+
         for (long i = 0; i < n_dim; i++){
             ret[i]= (orth[size/2][i] + orth[size/2-1][i])/2;
 
         }
-        return ret;
+
     } else{
-        return orth[size/2];
+        for (long i = 0; i < n_dim; i++){
+            ret[i]= orth[size/2][i];
+
+        }
     }
+    for(long i = 0; i < size; i++) free(orth[i]);
+    free(orth);
+    return ret;
+
 }
 
 struct L_R_ret{
@@ -169,42 +186,41 @@ struct L_R_ret{
     long second_size;
 };
 
-L_R_ret L_R(double ** data,double ** orthg,double* center,long data_size){
+struct L_R_ret* L_R(double ** data,double ** orthg,double* center,long data_size){
 
-    double **ret1 = (double **) malloc(data_size * sizeof(double *));
+    size_t size1=data_size/2;
 
-    for(long i = 0; i < data_size; i++) ret1[i] = (double *)malloc(n_dim * sizeof(double));
+    double **ret1 = (double **) malloc(size1 * sizeof(double *));
 
 
-    double **ret2 = (double **) malloc(data_size * sizeof(double *));
-    for(long i = 0; i < data_size; i++) ret2[i] = (double *)malloc(n_dim * sizeof(double));
+    size_t size2=data_size/2+1;
 
-    int aux1=0;
-    int aux2=0;
+    double **ret2 = (double **) malloc(size2 * sizeof(double *));
+
+    long aux1=0;
+    long aux2=0;
     for(long i=0;i<data_size;i++){
         if(orthg[i][0]<center[0]){
-            for(long j=0; j<n_dim;j++){
-                ret1[aux1][j]=data[i][j];
-            }
+
+
+
+            ret1[aux1]= data[i];//ponteiro data[i]
             aux1++;
         }
 
         else{
-            for(long j=0; j<n_dim;j++){
-                ret2[aux2][j]=data[i][j];
-
-            }
-
-
+            ret2[aux2]=data[i];
             aux2++;
         }
     }
 
-    L_R_ret ret;
-    ret.first=(ret1);
-    ret.second=(ret2);
-    ret.first_size=aux1;
-    ret.second_size=aux2;
+    free(data);
+
+    struct L_R_ret* ret=(L_R_ret*)malloc(sizeof (L_R_ret));
+    ret->first=(ret1);
+    ret->second=(ret2);
+    ret->first_size=aux1;
+    ret->second_size=aux2;
 
     return ret;
 
@@ -223,36 +239,39 @@ double rad(double** data, double* center,long data_size){
 }
 
 
-void fit(tree *node, double** dataset, long size){
+void fit(struct tree *node, double** dataset, long size){
 
     node->id=id;
     id++;
     if(size<=1){
         node->center=dataset[0];
         node->rad=0.0;
-        node->L=new tree;
-        node->R= new tree;
+        node->L=(struct tree*) malloc(sizeof (struct tree));
+        node->R=(struct tree*) malloc(sizeof (struct tree));
         node->L->id=-1;
         node->R->id=-1;
     }
     else{
-    pair_int a_b=far_away(dataset, size);
+    struct pair_int* a_b=far_away(dataset, size);
 
     double **orth_aux = orth(dataset, a_b, size);
+    free(a_b);
 
-
-    node->center=median_center(orth(dataset, a_b, size),size);
+    node->center=median_center(orth_aux,size);
 
 
     node->rad=rad(dataset,node->center,size);
 
 
-    L_R_ret L_R_aux= L_R(dataset,orth_aux,node->center,size);
+    struct L_R_ret* L_R_aux= L_R(dataset,orth_aux,node->center,size);
 
-    node->L= new tree;
-    fit(node->L,L_R_aux.first,L_R_aux.first_size);
-    node->R= new tree;
-    fit(node->R,L_R_aux.second,L_R_aux.second_size);
+    for(long i = 0; i < size; i++) free(orth_aux[i]);
+    free(orth_aux);
+
+    node->L=(struct tree*) malloc(sizeof (struct tree));
+    fit(node->L,L_R_aux->first,L_R_aux->first_size);
+    node->R=(struct tree*) malloc(sizeof (struct tree));
+    fit(node->R,L_R_aux->second,L_R_aux->second_size);
 
 }
 
@@ -260,7 +279,7 @@ void fit(tree *node, double** dataset, long size){
 
 
 // Funcao Visit
-void visit(tree *node) {
+void visit(struct tree *node) {
 
   printf("%d %d %d %f ",node->id,node->L->id,node->R->id, node->rad);
 
@@ -272,7 +291,7 @@ void visit(tree *node) {
   printf("%f\n",node->center[n_dim-1]);
 }  // funcao que imprime um produto da arvore
 
-void traverse(tree *node) {
+void traverse(struct tree *node) {
   // funcao que ira imprimir todos os elementos da arvore ordenadamente
   // (travessia in-order)
   if (node->rad == -1){
@@ -297,14 +316,18 @@ int main(int argc, char *argv[]){
     int n_dim_aux = atoi(argv[1]);
     long np = atol(argv[2]);
 
+    double exec_time;
+    exec_time = -omp_get_wtime();
+
     double **data = get_points(argc, argv, &n_dim_aux, &np);
     n_dim=n_dim_aux;
-    tree* aux= new tree;
+    struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
 
     fit(aux,data, np);
+    exec_time += omp_get_wtime();
+    fprintf(stderr, "%.1lf\n", exec_time);
+    //printf("%d %ld\n",n_dim_aux,id);
 
-    printf("%d %ld\n",n_dim_aux,id);
-
-    traverse(aux);
+    //traverse(aux);
     return 0;
 }
