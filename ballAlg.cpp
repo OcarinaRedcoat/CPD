@@ -218,6 +218,7 @@ L_R_ret L_R(double ** data,double ** orthg,double* center,long data_size){
         }
     }
 
+
     L_R_ret ret;
     ret.first=(ret1);
     ret.second=(ret2);
@@ -267,6 +268,9 @@ void fit(tree *node, double** dataset, long size){
 
     L_R_ret L_R_aux= L_R(dataset,orth_aux,node->center,size);
 
+    for(long i = 0; i < size; i++) free(orth_aux[i]);
+    free(orth_aux);
+
     node->L= new tree;
     fit(node->L,L_R_aux.first,L_R_aux.first_size);
     node->R= new tree;
@@ -313,24 +317,24 @@ void traverse(tree *node) {
 
 int main(int argc, char *argv[]){
     int n_dim_aux =2;
-    long np = 5;
-    n_dim=n_dim_aux;
-    double** ret1 = (double** ) malloc(5 * sizeof(double *));
+        long np = 5;
+        n_dim=n_dim_aux;
+        double** ret1 = (double** ) malloc(5 * sizeof(double *));
 
-        for(size_t i = 0; i < 5; i++) ret1[i] = (double *)malloc(2 * sizeof(double));
+            for(size_t i = 0; i < 5; i++) ret1[i] = (double *)malloc(2 * sizeof(double));
 
-        double data[5][2]={{7.8,8.0},{8.4,3.9},{9.1,2.0},{2.8,5.5},{3.4,7.7} };
+            double data[5][2]={{7.8,8.0},{8.4,3.9},{9.1,2.0},{2.8,5.5},{3.4,7.7} };
 
-        for(size_t i=0;i<5;i++){
-            ret1[i][0]=data[i][0];
-            ret1[i][1]=data[i][1];
-        }
-        tree* aux= new tree;
+            for(size_t i=0;i<5;i++){
+                ret1[i][0]=data[i][0];
+                ret1[i][1]=data[i][1];
+            }
+            tree* aux= new tree;
 
-        fit(aux,ret1,np);
+            fit(aux,ret1,np);
 
-    printf("%d %ld\n",n_dim_aux,id);
+        printf("%d %ld\n",n_dim_aux,id);
 
-    traverse(aux);
-    return 0;
+        traverse(aux);
+        return 0;
 }
