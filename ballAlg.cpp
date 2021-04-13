@@ -17,8 +17,8 @@ struct tree{
     double* center;
     double rad;
     int id;
-    tree *L;
-    tree *R;
+    struct tree *L;
+    struct tree *R;
 };
 
 struct pair_int{
@@ -51,7 +51,7 @@ double inner(double *a, double *b){
     return ret;
 }
 
-double ** orth(double **dataset, pair_int* a_b, long data_size){
+double ** orth(double **dataset,struct pair_int* a_b, long data_size){
 
     double **ret = (double **) malloc(data_size * sizeof(double *));
 
@@ -98,7 +98,7 @@ double ** orth(double **dataset, pair_int* a_b, long data_size){
 
 
 
-pair_int* far_away(double **data, long size){
+struct pair_int* far_away(double **data, long size){
     //metedo descrito no enunciado
 
     double aux= 0;
@@ -120,7 +120,7 @@ pair_int* far_away(double **data, long size){
                 b=j;
             }
     }
-    pair_int* ret=(pair_int*) malloc(sizeof(pair_int));
+    struct pair_int* ret=(struct pair_int*) malloc(sizeof(struct pair_int));
     ret->first=a;
     ret->second=b;
 
@@ -161,7 +161,7 @@ double* median_center( double **orth_aux,long size){
     double *ret = (double *) malloc(n_dim * sizeof(double));
 
     if (size%2 == 0){
-        ;
+
         for (long i = 0; i < n_dim; i++){
             ret[i]= (orth[size/2][i] + orth[size/2-1][i])/2;
 
@@ -186,7 +186,7 @@ struct L_R_ret{
     long second_size;
 };
 
-L_R_ret L_R(double ** data,double ** orthg,double* center,long data_size){
+struct L_R_ret* L_R(double ** data,double ** orthg,double* center,long data_size){
 
     size_t size1=data_size/2;
 
@@ -216,11 +216,11 @@ L_R_ret L_R(double ** data,double ** orthg,double* center,long data_size){
 
     free(data);
 
-    L_R_ret ret;
-    ret.first=(ret1);
-    ret.second=(ret2);
-    ret.first_size=aux1;
-    ret.second_size=aux2;
+    struct L_R_ret* ret=(L_R_ret*)malloc(sizeof (L_R_ret));
+    ret->first=(ret1);
+    ret->second=(ret2);
+    ret->first_size=aux1;
+    ret->second_size=aux2;
 
     return ret;
 
@@ -239,20 +239,20 @@ double rad(double** data, double* center,long data_size){
 }
 
 
-void fit(tree *node, double** dataset, long size){
+void fit(struct tree *node, double** dataset, long size){
 
     node->id=id;
     id++;
     if(size<=1){
         node->center=dataset[0];
         node->rad=0.0;
-        node->L=(tree*) malloc(sizeof (tree));
-        node->R=(tree*) malloc(sizeof (tree));
+        node->L=(struct tree*) malloc(sizeof (struct tree));
+        node->R=(struct tree*) malloc(sizeof (struct tree));
         node->L->id=-1;
         node->R->id=-1;
     }
     else{
-    pair_int* a_b=far_away(dataset, size);
+    struct pair_int* a_b=far_away(dataset, size);
 
     double **orth_aux = orth(dataset, a_b, size);
     free(a_b);
@@ -263,15 +263,15 @@ void fit(tree *node, double** dataset, long size){
     node->rad=rad(dataset,node->center,size);
 
 
-    L_R_ret L_R_aux= L_R(dataset,orth_aux,node->center,size);
+    struct L_R_ret* L_R_aux= L_R(dataset,orth_aux,node->center,size);
 
     for(long i = 0; i < size; i++) free(orth_aux[i]);
     free(orth_aux);
 
-    node->L=(tree*) malloc(sizeof (tree));;
-    fit(node->L,L_R_aux.first,L_R_aux.first_size);
-    node->R=(tree*) malloc(sizeof (tree));;
-    fit(node->R,L_R_aux.second,L_R_aux.second_size);
+    node->L=(struct tree*) malloc(sizeof (struct tree));
+    fit(node->L,L_R_aux->first,L_R_aux->first_size);
+    node->R=(struct tree*) malloc(sizeof (struct tree));
+    fit(node->R,L_R_aux->second,L_R_aux->second_size);
 
 }
 
@@ -279,7 +279,7 @@ void fit(tree *node, double** dataset, long size){
 
 
 // Funcao Visit
-void visit(tree *node) {
+void visit(struct tree *node) {
 
   printf("%d %d %d %f ",node->id,node->L->id,node->R->id, node->rad);
 
@@ -291,7 +291,7 @@ void visit(tree *node) {
   printf("%f\n",node->center[n_dim-1]);
 }  // funcao que imprime um produto da arvore
 
-void traverse(tree *node) {
+void traverse(struct tree *node) {
   // funcao que ira imprimir todos os elementos da arvore ordenadamente
   // (travessia in-order)
   if (node->rad == -1){
@@ -321,7 +321,7 @@ int main(int argc, char *argv[]){
 
     double **data = get_points(argc, argv, &n_dim_aux, &np);
     n_dim=n_dim_aux;
-    tree* aux= (tree*) malloc(sizeof (tree));;
+    struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
 
     fit(aux,data, np);
     exec_time += omp_get_wtime();
