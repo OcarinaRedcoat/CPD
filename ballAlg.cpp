@@ -120,7 +120,7 @@ pair_int* far_away(double **data, long size){
                 b=j;
             }
     }
-    pair_int* ret= new pair_int;
+    pair_int* ret=(pair_int*) malloc(sizeof(pair_int));
     ret->first=a;
     ret->second=b;
 
@@ -246,8 +246,8 @@ void fit(tree *node, double** dataset, long size){
     if(size<=1){
         node->center=dataset[0];
         node->rad=0.0;
-        node->L=new tree;
-        node->R= new tree;
+        node->L=(tree*) malloc(sizeof (tree));
+        node->R=(tree*) malloc(sizeof (tree));
         node->L->id=-1;
         node->R->id=-1;
     }
@@ -268,9 +268,9 @@ void fit(tree *node, double** dataset, long size){
     for(long i = 0; i < size; i++) free(orth_aux[i]);
     free(orth_aux);
 
-    node->L= new tree;
+    node->L=(tree*) malloc(sizeof (tree));;
     fit(node->L,L_R_aux.first,L_R_aux.first_size);
-    node->R= new tree;
+    node->R=(tree*) malloc(sizeof (tree));;
     fit(node->R,L_R_aux.second,L_R_aux.second_size);
 
 }
@@ -321,7 +321,7 @@ int main(int argc, char *argv[]){
 
     double **data = get_points(argc, argv, &n_dim_aux, &np);
     n_dim=n_dim_aux;
-    tree* aux= new tree;
+    tree* aux= (tree*) malloc(sizeof (tree));;
 
     fit(aux,data, np);
     exec_time += omp_get_wtime();
