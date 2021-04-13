@@ -2,6 +2,8 @@
 
 #include <stdlib.h>
 
+#include <omp.h>
+
 #include "gen_points.c"
 
 
@@ -190,34 +192,29 @@ L_R_ret L_R(double ** data,double ** orthg,double* center,long data_size){
 
     double **ret1 = (double **) malloc(size1 * sizeof(double *));
 
-    for(long i = 0; i < size1; i++) ret1[i] = (double *)malloc(n_dim * sizeof(double));
 
     size_t size2=data_size/2+1;
 
     double **ret2 = (double **) malloc(size2 * sizeof(double *));
-    for(long i = 0; i < size2; i++) ret2[i] = (double *)malloc(n_dim * sizeof(double));
 
     long aux1=0;
     long aux2=0;
     for(long i=0;i<data_size;i++){
         if(orthg[i][0]<center[0]){
-            for(long j=0; j<n_dim;j++){
-                ret1[aux1][j]=data[i][j];
-            }
+
+
+
+            ret1[aux1]= data[i];//ponteiro data[i]
             aux1++;
         }
 
         else{
-            for(long j=0; j<n_dim;j++){
-                ret2[aux2][j]=data[i][j];
-
-            }
-
-
+            ret2[aux2]=data[i];
             aux2++;
         }
     }
 
+    free(data);
 
     L_R_ret ret;
     ret.first=(ret1);
@@ -316,25 +313,21 @@ void traverse(tree *node) {
 
 
 int main(int argc, char *argv[]){
-    int n_dim_aux =2;
-        long np = 5;
-        n_dim=n_dim_aux;
-        double** ret1 = (double** ) malloc(5 * sizeof(double *));
+    int n_dim_aux = atoi(argv[1]);
+    long np = atol(argv[2]);
 
-            for(size_t i = 0; i < 5; i++) ret1[i] = (double *)malloc(2 * sizeof(double));
+    double exec_time;
+    exec_time = -omp_get_wtime();
 
-            double data[5][2]={{7.8,8.0},{8.4,3.9},{9.1,2.0},{2.8,5.5},{3.4,7.7} };
+    double **data = get_points(argc, argv, &n_dim_aux, &np);
+    n_dim=n_dim_aux;
+    tree* aux= new tree;
 
-            for(size_t i=0;i<5;i++){
-                ret1[i][0]=data[i][0];
-                ret1[i][1]=data[i][1];
-            }
-            tree* aux= new tree;
+    fit(aux,data, np);
+    exec_time += omp_get_wtime();
+    fprintf(stderr, "%.1lf\n", exec_time);
+    //printf("%d %ld\n",n_dim_aux,id);
 
-            fit(aux,ret1,np);
-
-        printf("%d %ld\n",n_dim_aux,id);
-
-        traverse(aux);
-        return 0;
+    //traverse(aux);
+    return 0;
 }
