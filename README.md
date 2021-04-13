@@ -1,4 +1,5 @@
 
+otimizar codigo;
 
 paralizar o s loops de matematica;
 
