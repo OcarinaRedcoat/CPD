@@ -14,7 +14,7 @@
   */
 struct tree{
     double* center;
-    double rad=-1;
+    double rad;
     int id;
     tree *L;
     tree *R;
