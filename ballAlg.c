@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 
-#include <omp.h>
+//#include <omp.h>
 
 #include "gen_points.c"
 
@@ -277,8 +277,6 @@ void fit(struct tree *node, double** dataset, long size){
 
     fit(node->R,L_R_aux->second,L_R_aux->second_size);
 
-    free(L_R_aux->first);
-    free(L_R_aux->second);
     free(L_R_aux);
 
 }
@@ -324,16 +322,21 @@ int main(int argc, char *argv[]){
     int n_dim_aux = atoi(argv[1]);
     long np = atol(argv[2]);
 
-    double exec_time;
-    exec_time = -omp_get_wtime();
+  //  double exec_time;
+ //   exec_time = -omp_get_wtime();
 
     double **data = get_points(argc, argv, &n_dim_aux, &np);
+
+		for (int i=0; i<np; i++){
+			printf("%f %f\n",data[i][0], data[i][1]);
+		}
+
     n_dim=n_dim_aux;
     struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
 
     fit(aux,data, np);
-    exec_time += omp_get_wtime();
-    fprintf(stderr, "%.1lf\n", exec_time);
+ //   exec_time += omp_get_wtime();
+//    fprintf(stderr, "%.1lf\n", exec_time);
     //printf("%d %ld\n",n_dim_aux,id);
 
     //traverse(aux);
