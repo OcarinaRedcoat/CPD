@@ -279,8 +279,8 @@ int main(int argc, char *argv[]){
     data = get_points(argc, argv, &n_dim_aux, &np);
     n_dim=n_dim_aux;
     struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
-    int * index=(int*) malloc(np*sizeof(int));
-    for(int i=0;i<np;i++){
+    long * index=(long*) malloc(np*sizeof(long));
+    for(long i=0;i<np;i++){
         index[i]=i;
     }
     fit(aux,index, np);
