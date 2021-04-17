@@ -46,7 +46,7 @@ double inner(double *a, double *b){
 }
 
 
-double rad(int* data_index, double* center,long data_size){
+double rad(long* data_index, double* center,long data_size){
     double ret=0;
     for(long i=0; i<data_size;i++){
         double aux=eucl(data[data_index[i]],center);
@@ -67,8 +67,8 @@ struct orth_data{
 int compare (const void * a, const void * b)
 {
 
-  struct orth_data *aa = (struct orth_data *)a;
-  struct orth_data *bb = (struct orth_data *)b;
+  struct orth_data *aa = *(struct orth_data **)a;
+  struct orth_data *bb = *(struct orth_data **)b;
 
 
   if (aa->orth > bb->orth)
@@ -151,9 +151,11 @@ void fit(struct tree *node, long* data_index, long size){
 
         }
 
+
     //AQUI!!
         //FIND THE MEDIUM POINT
         qsort(orth, size, sizeof(struct orth_data*), compare);
+
 
         node->center = (double *) malloc(n_dim * sizeof(double));
 
@@ -180,6 +182,7 @@ void fit(struct tree *node, long* data_index, long size){
         }
 
 
+
     node->rad=rad(data_index,node->center,size);
 
     size_t size1=size/2;
@@ -193,10 +196,13 @@ void fit(struct tree *node, long* data_index, long size){
 
     long aux1=0;
     long aux2=0;
+
+
     //THE POINTS WITH SMALLER ORTH THAN
     for(long i=0;i<size;i++){
+        printf("%ld %ld       ",aux1,aux2);
 
-        if(orth[i]->orth<node->center[0]){
+        if(  orth[i]->orth<   node->center[0]){
 
 
 
@@ -209,6 +215,7 @@ void fit(struct tree *node, long* data_index, long size){
             aux2++;
         }
     }
+
 
     free(data_index);
 
@@ -280,7 +287,7 @@ int main(int argc, char *argv[]){
     exec_time += omp_get_wtime();
     fprintf(stderr, "%.1lf\n", exec_time);
 
-    //printf("%d %ld\n",n_dim_aux,id);
+    printf("%d %ld\n",n_dim_aux,id);
 
     //traverse(aux);
     return 0;
