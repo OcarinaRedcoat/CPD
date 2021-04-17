@@ -372,6 +372,6 @@ int main(int argc, char *argv[]){
     fprintf(stderr, "%.1lf\n", exec_time);
     printf("%d %ld\n",n_dim_aux,global_id);
 
-    traverse(aux);
+    //traverse(aux);
     return 0;
 }
