@@ -243,9 +243,8 @@ void fit(struct tree *node, double** dataset, long size,long id){
     printf("%lid:ld num: %d  \n",id, omp_get_thread_num());
 
 #pragma omp atomic
-    {
     global_id++;
-    }
+  
     if(size<=1){
         node->center=dataset[0];
         node->rad=0.0;
@@ -285,7 +284,7 @@ void fit(struct tree *node, double** dataset, long size,long id){
 
     free(L_R_aux);
 
-}
+  }
 
 }
 
@@ -327,7 +326,7 @@ void traverse(struct tree *node) {
 int main(int argc, char *argv[]){
     int n_dim_aux = atoi(argv[1]);
     long np = atol(argv[2]);
-    printf("%ld \n",omp_get_num_procs());
+    printf("%d \n",omp_get_num_procs());
     double exec_time;
     exec_time = -omp_get_wtime();
 
