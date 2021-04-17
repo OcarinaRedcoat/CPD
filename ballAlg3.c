@@ -236,57 +236,6 @@ double rad(double** data, double* center,long data_size){
     return sqrt(ret);
 }
 
-
-void fit(struct tree *node, double** dataset, long size,long id){
-
-    node->id=id;
-#pragma omp atomic
-    global_id++;
-  
-    if(size<=1){
-        node->center=dataset[0];
-        node->rad=0.0;
-        node->L=(struct tree*) malloc(sizeof (struct tree));
-        node->R=(struct tree*) malloc(sizeof (struct tree));
-        node->L->id=-1;
-        node->R->id=-1;
-    }
-    else{
-
-    struct pair_int* a_b=far_away(dataset, size);
-
-    double **orth_aux = orth(dataset, a_b, size);
-    free(a_b);
-
-    node->center=median_center(orth_aux,size);
-
-
-    node->rad=rad(dataset,node->center,size);
-
-
-    struct L_R_ret* L_R_aux= L_R(dataset,orth_aux,node->center,size);
-
-
-    for(long i = 0; i < size; i++) free(orth_aux[i]);
-    free(orth_aux);
-
-    node->L=(struct tree*) malloc(sizeof (struct tree));
-
-    node->R=(struct tree*) malloc(sizeof (struct tree));
-
-#pragma omp task
-    fit(node->L,L_R_aux->first,L_R_aux->first_size,2*id+1);
-#pragma omp task
-    fit(node->R,L_R_aux->second,L_R_aux->second_size,2*id+2);
-#pragma omp taskwait
-
-    free(L_R_aux);
-
-  }
-
-}
-
-
 // Funcao Visit
 void fit(struct tree *node, double** dataset, long size,long id,int level){
 
@@ -313,18 +262,18 @@ void fit(struct tree *node, double** dataset, long size,long id,int level){
         num_threads=1;
     }
 
-    struct pair_int* a_b=far_away(dataset, size,num_threads);
+    struct pair_int* a_b=far_away(dataset, size);
 
-    double **orth_aux = orth(dataset, a_b, size,num_threads);
+    double **orth_aux = orth(dataset, a_b, size);
     free(a_b);
 
-    node->center=median_center(orth_aux,size,num_threads);
+    node->center=median_center(orth_aux,size);
 
 
-    node->rad=rad(dataset,node->center,size,num_threads);
+    node->rad=rad(dataset,node->center,size);
 
 
-    struct L_R_ret* L_R_aux= L_R(dataset,orth_aux,node->center,size,num_threads);
+    struct L_R_ret* L_R_aux= L_R(dataset,orth_aux,node->center,size);
 
 
     for(long i = 0; i < size; i++) free(orth_aux[i]);
