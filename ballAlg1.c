@@ -274,12 +274,17 @@ void fit(struct tree *node, double** dataset, long size,long id){
 
     node->R=(struct tree*) malloc(sizeof (struct tree));
 
-#pragma omp task
-    fit(node->L,L_R_aux->first,L_R_aux->first_size,2*id+1);
-#pragma omp task
-    fit(node->R,L_R_aux->second,L_R_aux->second_size,2*id+2);
-#pragma omp taskwait
-
+#pragma omp parallel sections
+    {
+#pragma omp section
+        {
+    fit(node->L,L_R_aux->first,L_R_aux->first_size,2*id+1,level*2);
+        }
+#pragma omp section
+        {
+    fit(node->R,L_R_aux->second,L_R_aux->second_size,2*id+2,level*2);
+        }
+}
     free(L_R_aux);
 
   }
@@ -326,17 +331,17 @@ int main(int argc, char *argv[]){
     long np = atol(argv[2]);
     printf("%d \n",omp_get_num_procs());
     double exec_time;
+      omp_set_nested(1);
+
     exec_time = -omp_get_wtime();
 
     double **data = get_points(argc, argv, &n_dim_aux, &np);
 
     n_dim=n_dim_aux;
     struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
-#pragma omp parallel
-#pragma omp single
-{
+
     fit(aux,data, np,0);
-}
+  
     exec_time += omp_get_wtime();
     fprintf(stderr, "%.1lf\n", exec_time);
     printf("%d %ld\n",n_dim_aux,global_id);
