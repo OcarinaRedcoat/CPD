@@ -51,7 +51,7 @@ double inner(double *a, double *b){
     return ret;
 }
 
-double ** orth(double **dataset,struct pair_int* a_b, long data_size,int num_threads){
+double ** orth(double **dataset,struct pair_int* a_b, long data_size){
 
     double **ret = (double **) malloc(data_size * sizeof(double *));
 
@@ -97,7 +97,7 @@ double ** orth(double **dataset,struct pair_int* a_b, long data_size,int num_thr
 
 
 
-struct pair_int* far_away(double **data, long size,int num_threads){
+struct pair_int* far_away(double **data, long size){
     //metedo descrito no enunciado
 
     double aux= 0;
@@ -141,7 +141,7 @@ int comp(const void *a, const void *b){ // Não está a entrar aqui ???
         return 0;
 }
 
-double* median_center( double **orth_aux,long size,int num_threads){
+double* median_center( double **orth_aux,long size){
 
 
     double **orth = (double **) malloc(size * sizeof(double *));
@@ -184,7 +184,7 @@ struct L_R_ret{
     long second_size;
 };
 
-struct L_R_ret* L_R(double ** data,double ** orthg,double* center,long data_size,int num_threads){
+struct L_R_ret* L_R(double ** data,double ** orthg,double* center,long data_size){
 
     size_t size1=data_size/2;
 
@@ -224,7 +224,7 @@ struct L_R_ret* L_R(double ** data,double ** orthg,double* center,long data_size
 
 
 }
-double rad(double** data, double* center,long data_size,int num_threads){
+double rad(double** data, double* center,long data_size){
     double ret=0;
     for(long i=0; i<data_size;i++){
         double aux=eucl(data[i],center);
@@ -237,7 +237,7 @@ double rad(double** data, double* center,long data_size,int num_threads){
 }
 
 
-void fit(struct tree *node, double** dataset, long size,long id,int level){
+void fit(struct tree *node, double** dataset, long size,long id){
 
     node->id=id;
     printf("%lid:ld num: %d  \n",id, omp_get_thread_num());
@@ -256,25 +256,18 @@ void fit(struct tree *node, double** dataset, long size,long id,int level){
     }
     else{
 
+    struct pair_int* a_b=far_away(dataset, size);
 
-    int num_threads= omp_get_num_procs() / level;
-
-    if(num_threads<1){
-        num_threads=1;
-    }
-
-    struct pair_int* a_b=far_away(dataset, size,num_threads);
-
-    double **orth_aux = orth(dataset, a_b, size,num_threads);
+    double **orth_aux = orth(dataset, a_b, size);
     free(a_b);
 
-    node->center=median_center(orth_aux,size,num_threads);
+    node->center=median_center(orth_aux,size);
 
 
-    node->rad=rad(dataset,node->center,size,num_threads);
+    node->rad=rad(dataset,node->center,size);
 
 
-    struct L_R_ret* L_R_aux= L_R(dataset,orth_aux,node->center,size,num_threads);
+    struct L_R_ret* L_R_aux= L_R(dataset,orth_aux,node->center,size);
 
 
     for(long i = 0; i < size; i++) free(orth_aux[i]);
@@ -285,9 +278,9 @@ void fit(struct tree *node, double** dataset, long size,long id,int level){
     node->R=(struct tree*) malloc(sizeof (struct tree));
 
 #pragma omp task
-    fit(node->L,L_R_aux->first,L_R_aux->first_size,2*id+1,level*2);
+    fit(node->L,L_R_aux->first,L_R_aux->first_size,2*id+1);
 #pragma omp task
-    fit(node->R,L_R_aux->second,L_R_aux->second_size,2*id+2,level*2);
+    fit(node->R,L_R_aux->second,L_R_aux->second_size,2*id+2);
 #pragma omp taskwait
 
     free(L_R_aux);
@@ -345,7 +338,7 @@ int main(int argc, char *argv[]){
 #pragma omp parallel
 #pragma omp single
 {
-    fit(aux,data, np,0,1);
+    fit(aux,data, np,0);
 }
     exec_time += omp_get_wtime();
     fprintf(stderr, "%.1lf\n", exec_time);
