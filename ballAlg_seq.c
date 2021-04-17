@@ -326,11 +326,6 @@ int main(int argc, char *argv[]){
     exec_time = -omp_get_wtime();
 
     double **data = get_points(argc, argv, &n_dim_aux, &np);
-
-		for (int i=0; i<np; i++){
-			printf("%f %f\n",data[i][0], data[i][1]);
-		}
-
     n_dim=n_dim_aux;
     struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
 
