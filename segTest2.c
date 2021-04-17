@@ -212,12 +212,12 @@ void fit(struct tree *node, int* data_index, long size){
 
 
 
-            ret1[aux1]= i;//ponteiro data[i]
+            ret1[aux1]= data_index[i];//ponteiro data[i]
             aux1++;
         }
 
         else{
-            ret2[aux2]=i;
+            ret2[aux2]=data_index[i];
             aux2++;
         }
     }
