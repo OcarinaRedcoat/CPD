@@ -14,5 +14,8 @@ clean:
 	@echo ----  Cleaning project ...  ----
 	@echo 
 	rm -f $(TARGET) 
+	rm ballAlg2.c.opari.inc
+	rm opari.* 
+	rm *.txt
 	@echo
 	@echo ----  Very nice!  ----
