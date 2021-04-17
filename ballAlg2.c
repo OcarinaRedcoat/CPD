@@ -364,10 +364,10 @@ int main(int argc, char *argv[]){
 
     n_dim=n_dim_aux;
     struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
+    omp_set_nested(1);
 
-{
     fit(aux,data, np,0,1);
-}
+  
     exec_time += omp_get_wtime();
     fprintf(stderr, "%.1lf\n", exec_time);
     printf("%d %ld\n",n_dim_aux,global_id);
