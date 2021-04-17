@@ -240,8 +240,6 @@ double rad(double** data, double* center,long data_size){
 void fit(struct tree *node, double** dataset, long size,long id){
 
     node->id=id;
-    printf("%lid:ld num: %d  \n",id, omp_get_thread_num());
-
 #pragma omp atomic
     global_id++;
   
