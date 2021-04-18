@@ -181,6 +181,7 @@ void fit(struct tree *node, int* data_index, long size){
     id++;
     if(size<=1){
         node->center=data[data_index[0]];
+        free(data_index);
         node->rad=0.0;
         node->L=(struct tree*) malloc(sizeof (struct tree));
         node->R=(struct tree*) malloc(sizeof (struct tree));
@@ -198,7 +199,7 @@ void fit(struct tree *node, int* data_index, long size){
 
     size_t size1=size/2;
 
-    int *ret1 = (int *) malloc(size1 * sizeof(int));
+    long *ret1 = (long *) malloc(size1 * sizeof(long));
 
 
     size_t size2=size/2+1;
@@ -212,12 +213,13 @@ void fit(struct tree *node, int* data_index, long size){
 
 
 
-            ret1[aux1]= i;//ponteiro data[i]
+            ret1[aux1] = data_index[i]
+
             aux1++;
         }
 
         else{
-            ret2[aux2]=i;
+            ret2[aux2] = data_index[i];
             aux2++;
         }
     }
