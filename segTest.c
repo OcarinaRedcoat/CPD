@@ -45,10 +45,10 @@ double inner(double *a, double *b){
     return ret;
 }
 
-double ** orth(int *data_index, long data_size){
+double ** orth(long *data_index, long data_size){
 
     double aux_dist= 0;
-    int a=0;
+    long a=0;
     for(long i=1;i<data_size;i++){
         double auxx_dist=eucl(data[data_index[0]],data[data_index[i]]);
             if(auxx_dist>aux_dist){
@@ -56,7 +56,7 @@ double ** orth(int *data_index, long data_size){
                 a=data_index[i];
             }
     }
-    int b=0;
+    long b=0;
     aux_dist=0;
         for(long j=0;j<data_size;j++){
 
@@ -127,9 +127,10 @@ double* median_center( double **orth_aux,long size){
 
 
     double **orth = (double **) malloc(size * sizeof(double *));
-    for(long i = 0; i < size; i++) orth[i] = (double *)malloc(n_dim * sizeof(double));
+    //for(long i = 0; i < size; i++) orth[i] = (double *)malloc(n_dim * sizeof(double));
 
     for(long i=0;i<size;i++){
+        orth[i] = (double *)malloc(n_dim * sizeof(double));
         for(long j=0;j<n_dim;j++){
             orth[i][j]=orth_aux[i][j];
         }
@@ -162,7 +163,7 @@ double* median_center( double **orth_aux,long size){
 
 
 
-double rad(int* data_index, double* center,long data_size){
+double rad(long* data_index, double* center,long data_size){
     double ret=0;
     for(long i=0; i<data_size;i++){
         double aux=eucl(data[data_index[i]],center);
@@ -175,7 +176,7 @@ double rad(int* data_index, double* center,long data_size){
 }
 
 
-void fit(struct tree *node, int* data_index, long size){
+void fit(struct tree *node, long* data_index, long size){
 
     node->id=id;
     id++;
@@ -204,7 +205,7 @@ void fit(struct tree *node, int* data_index, long size){
 
     size_t size2=size/2+1;
 
-    int *ret2 = (int *) malloc(size2 * sizeof(int));
+    long *ret2 = (long *) malloc(size2 * sizeof(long));
 
     long aux1=0;
     long aux2=0;
@@ -213,13 +214,13 @@ void fit(struct tree *node, int* data_index, long size){
 
 
 
-            ret1[aux1] = data_index[i]
+            ret1[aux1] = data_index[i];
 
             aux1++;
         }
 
         else{
-            ret2[aux2] = data_index[i];
+            ret2[aux2]= data_index[i];
             aux2++;
         }
     }
@@ -286,8 +287,8 @@ int main(int argc, char *argv[]){
     data = get_points(argc, argv, &n_dim_aux, &np);
     n_dim=n_dim_aux;
     struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
-    int * index=(int*) malloc(np*sizeof(int));
-    for(int i=0;i<np;i++){
+    long * index=(long*) malloc(np*sizeof(long));
+    for(long i=0;i<np;i++){
         index[i]=i;
     }
     fit(aux,index, np);
