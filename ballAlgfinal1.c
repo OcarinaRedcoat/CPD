@@ -6,13 +6,6 @@
 
 #include "gen_points.c"
 
-
-/*
-  falta:
-  limpar memoria
-  substituir no void a 2 chamada do orth por uma copia
-  melhorar alguma das alocaçºoes de memoria que fiz
-  */
 struct tree{
     double* center;
     double rad;
@@ -31,7 +24,7 @@ double eucl(double *aux1, double *aux2){
 
     for(long i=0; i < n_dim; i++){
         aux=aux1[i]-aux2[i];
-        ret= ret+ aux*aux;
+        ret+= aux*aux;
     }
     return ret;
 }
@@ -39,7 +32,7 @@ double eucl(double *aux1, double *aux2){
 double inner(double *a, double *b){
     double ret=0.0;
     for(long i=0;i < n_dim; i++){
-        ret=ret+a[i]*b[i];
+        ret+=a[i]*b[i];
     }
     return ret;
 }
@@ -107,8 +100,7 @@ double ** orth(double **dataset, long data_size){
 }
 
 
-int comp(const void *a, const void *b){ // Não está a entrar aqui ???
-// n sei se existe uma malhor forma de fazer isto
+int comp(const void *a, const void *b){ 
 
     double *aa = *(double * const *)a;
     double *bb = *(double * const *)b;
@@ -133,7 +125,7 @@ double* median_center( double **orth_aux,long size){
     }
 
 
-        // n sei se isto modifica a ordem
+        
     qsort(orth, size, sizeof(*orth), comp);
 
     double *ret = (double *) malloc(n_dim * sizeof(double));
@@ -178,11 +170,13 @@ void fit(struct tree *node, double** dataset, long size){
     id++;
     if(size<=1){
         node->center=dataset[0];
+        free(dataset);
         node->rad=0.0;
         node->L=(struct tree*) malloc(sizeof (struct tree));
         node->R=(struct tree*) malloc(sizeof (struct tree));
         node->L->id=-1;
         node->R->id=-1;
+        
     }
     else{
 
@@ -234,8 +228,6 @@ void fit(struct tree *node, double** dataset, long size){
 
 }
 
-
-// Funcao Visit
 void visit(struct tree *node) {
 
   printf("%d %d %d %f ",node->id,node->L->id,node->R->id, node->rad);
@@ -246,11 +238,10 @@ void visit(struct tree *node) {
   }
 
   printf("%f\n",node->center[n_dim-1]);
-}  // funcao que imprime um produto da arvore
+}
 
 void traverse(struct tree *node) {
-  // funcao que ira imprimir todos os elementos da arvore ordenadamente
-  // (travessia in-order)
+  
   if (node->rad == -1){
         return;
     }
@@ -284,9 +275,9 @@ int main(int argc, char *argv[]){
     exec_time += omp_get_wtime();
     fprintf(stderr, "%.1lf\n", exec_time);
 
-    //printf("%d %ld\n",n_dim_aux,id);
+    printf("%d %ld\n",n_dim_aux,id);
 
-    //traverse(aux);
+    traverse(aux);
     return 0;
 }
 
