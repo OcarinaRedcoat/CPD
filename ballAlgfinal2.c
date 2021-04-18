@@ -7,12 +7,6 @@
 #include "gen_points.c"
 
 
-/*
-  falta:
-  limpar memoria
-  substituir no void a 2 chamada do orth por uma copia
-  melhorar alguma das alocaçºoes de memoria que fiz
-  */
 struct tree{
     double* center;
     double rad;
@@ -30,7 +24,7 @@ double eucl(double *aux1, double *aux2){
     double ret=0.0;
     double aux=0.0;
 
-    for(long i=0; i < n_dim; i++){
+    for(int i=0; i < n_dim; i++){
         aux=aux1[i]-aux2[i];
         ret= ret+ aux*aux;
     }
@@ -39,7 +33,7 @@ double eucl(double *aux1, double *aux2){
 
 double inner(double *a, double *b){
     double ret=0.0;
-    for(long i=0;i < n_dim; i++){
+    for(int i=0;i < n_dim; i++){
         ret=ret+a[i]*b[i];
     }
     return ret;
@@ -73,7 +67,7 @@ double ** orth(int *data_index, long data_size){
 
     double sub_aux[n_dim];
 
-    for(long j=0;j<n_dim;j++){
+    for(int j=0;j<n_dim;j++){
         b_a[j]=data[b][j]-data[a][j];
     }
 
@@ -87,14 +81,14 @@ double ** orth(int *data_index, long data_size){
         ret[i] = (double *)malloc(n_dim * sizeof(double));
 
         //(p-a)
-        for(long j=0;j<n_dim;j++){
+        for(int j=0;j<n_dim;j++){
             sub_aux[j]=data[data_index[i]][j]-data[a][j];
         }
 
         aux=inner(sub_aux,b_a)/inner_b_a;
 
         // (p-a).(b-a)/(b-a).(b-a) *(b-a) + a
-        for(long j=0;j<n_dim;j++){
+        for(int j=0;j<n_dim;j++){
             ret[i][j]=  aux        *         b_a[j]    +      data[a][j];
         }
 
@@ -106,9 +100,7 @@ double ** orth(int *data_index, long data_size){
 }
 
 
-int comp(const void *a, const void *b){ // Não está a entrar aqui ???
-// n sei se existe uma malhor forma de fazer isto
-
+int comp(const void *a, const void *b){ 
     double *aa = *(double * const *)a;
     double *bb = *(double * const *)b;
     if (aa[0] > bb[0])
@@ -126,26 +118,24 @@ double* median_center( double **orth_aux,long size){
 
     for(long i=0;i<size;i++){
         orth[i] = (double *)malloc(n_dim * sizeof(double));
-        for(long j=0;j<n_dim;j++){
+        for(int j=0;j<n_dim;j++){
             orth[i][j]=orth_aux[i][j];
         }
     }
 
-
-        // n sei se isto modifica a ordem
     qsort(orth, size, sizeof(*orth), comp);
 
     double *ret = (double *) malloc(n_dim * sizeof(double));
 
     if (size%2 == 0){
 
-        for (long i = 0; i < n_dim; i++){
+        for (int i = 0; i < n_dim; i++){
             ret[i]= (orth[size/2][i] + orth[size/2-1][i])/2;
 
         }
 
     } else{
-        for (long i = 0; i < n_dim; i++){
+        for (int i = 0; i < n_dim; i++){
             ret[i]= orth[size/2][i];
 
         }
@@ -158,7 +148,7 @@ double* median_center( double **orth_aux,long size){
 
 
 
-double rad(int* data_index, double* center,long data_size){
+double rad(long* data_index, double* center,long data_size){
     double ret=0;
     for(long i=0; i<data_size;i++){
         double aux=eucl(data[data_index[i]],center);
@@ -171,12 +161,13 @@ double rad(int* data_index, double* center,long data_size){
 }
 
 
-void fit(struct tree *node, int* data_index, long size){
+void fit(struct tree *node, long* data_index, long size){
 
     node->id=id;
     id++;
     if(size<=1){
         node->center=data[data_index[0]];
+        free(dataset);
         node->rad=0.0;
         node->L=(struct tree*) malloc(sizeof (struct tree));
         node->R=(struct tree*) malloc(sizeof (struct tree));
@@ -194,7 +185,7 @@ void fit(struct tree *node, int* data_index, long size){
 
     size_t size1=size/2;
 
-    int *ret1 = (int *) malloc(size1 * sizeof(int));
+    long *ret1 = (long *) malloc(size1 * sizeof(long));
 
 
     size_t size2=size/2+1;
@@ -235,7 +226,6 @@ void fit(struct tree *node, int* data_index, long size){
 }
 
 
-// Funcao Visit
 void visit(struct tree *node) {
 
   printf("%d %d %d %f ",node->id,node->L->id,node->R->id, node->rad);
@@ -246,11 +236,9 @@ void visit(struct tree *node) {
   }
 
   printf("%f\n",node->center[n_dim-1]);
-}  // funcao que imprime um produto da arvore
-
+}  
 void traverse(struct tree *node) {
-  // funcao que ira imprimir todos os elementos da arvore ordenadamente
-  // (travessia in-order)
+  
   if (node->rad == -1){
         return;
     }
@@ -279,7 +267,7 @@ int main(int argc, char *argv[]){
     data = get_points(argc, argv, &n_dim_aux, &np);
     n_dim=n_dim_aux;
     struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
-    int * index=(int*) malloc(np*sizeof(int));
+    long * index=(long*) malloc(np*sizeof(int));
     for(int i=0;i<np;i++){
         index[i]=i;
     }
@@ -287,9 +275,9 @@ int main(int argc, char *argv[]){
     exec_time += omp_get_wtime();
     fprintf(stderr, "%.1lf\n", exec_time);
 
-    //printf("%d %ld\n",n_dim_aux,id);
+    printf("%d %ld\n",n_dim_aux,id);
 
-    //traverse(aux);
+    traverse(aux);
     return 0;
 }
 
