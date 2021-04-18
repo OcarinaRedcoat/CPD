@@ -67,10 +67,7 @@ double ** orth(double **dataset, long data_size){
     }
 
     double **ret = (double **) malloc(data_size * sizeof(double *));
-
-
-    for(long i = 0; i < data_size; i++) ret[i] = (double *)malloc(n_dim * sizeof(double));
-
+  
     double b_a[n_dim];
 
     double sub_aux[n_dim];
@@ -88,6 +85,7 @@ double ** orth(double **dataset, long data_size){
     double aux;
 
     for(long i=0;i < data_size ;i++){
+      ret[i] = (double *)malloc(n_dim * sizeof(double))
 
         //(p-a)
         for(long j=0;j<n_dim;j++){
@@ -126,9 +124,9 @@ double* median_center( double **orth_aux,long size){
 
 
     double **orth = (double **) malloc(size * sizeof(double *));
-    for(long i = 0; i < size; i++) orth[i] = (double *)malloc(n_dim * sizeof(double));
 
     for(long i=0;i<size;i++){
+        orth[i] = (double *)malloc(n_dim * sizeof(double));
         for(long j=0;j<n_dim;j++){
             orth[i][j]=orth_aux[i][j];
         }
