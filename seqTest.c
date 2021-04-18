@@ -209,8 +209,6 @@ void fit(struct tree *node, double** dataset, long size){
     for(long i=0;i<size;i++){
         if(orth_aux[i][0]<node->center[0]){
 
-
-
             ret1[aux1]= dataset[i];//ponteiro data[i]
             aux1++;
         }
@@ -219,11 +217,11 @@ void fit(struct tree *node, double** dataset, long size){
             ret2[aux2]=dataset[i];
             aux2++;
         }
+      free(orth_aux[i]);
     }
 
     free(dataset);
 
-    for(long i = 0; i < size; i++) free(orth_aux[i]);
     free(orth_aux);
 
     node->L=(struct tree*) malloc(sizeof (struct tree));
