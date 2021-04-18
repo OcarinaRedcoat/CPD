@@ -22,7 +22,7 @@ double eucl(double *aux1, double *aux2){
     double ret=0.0;
     double aux=0.0;
 
-    for(long i=0; i < n_dim; i++){
+    for(int=0; i < n_dim; i++){
         aux=aux1[i]-aux2[i];
         ret+= aux*aux;
     }
@@ -31,7 +31,7 @@ double eucl(double *aux1, double *aux2){
 
 double inner(double *a, double *b){
     double ret=0.0;
-    for(long i=0;i < n_dim; i++){
+    for(int i=0;i < n_dim; i++){
         ret+=a[i]*b[i];
     }
     return ret;
@@ -66,7 +66,7 @@ double ** orth(double **dataset, long data_size){
     double sub_aux[n_dim];
 
 
-    for(long j=0;j<n_dim;j++){
+    for(int j=0;j<n_dim;j++){
         b_a[j]=dataset[b][j]-dataset[a][j];
     }
 
@@ -81,14 +81,14 @@ double ** orth(double **dataset, long data_size){
       ret[i] = (double *)malloc(n_dim * sizeof(double))
 
         //(p-a)
-        for(long j=0;j<n_dim;j++){
+        for(int j=0;j<n_dim;j++){
             sub_aux[j]=dataset[i][j]-dataset[a][j];
         }
 
         aux=inner(sub_aux,b_a)/inner_b_a;
 
         // (p-a).(b-a)/(b-a).(b-a) *(b-a) + a
-        for(long j=0;j<n_dim;j++){
+        for(int j=0;j<n_dim;j++){
             ret[i][j]=  aux        *         b_a[j]    +      dataset[a][j];
         }
 
@@ -119,7 +119,7 @@ double* median_center( double **orth_aux,long size){
 
     for(long i=0;i<size;i++){
         orth[i] = (double *)malloc(n_dim * sizeof(double));
-        for(long j=0;j<n_dim;j++){
+        for(int j=0;j<n_dim;j++){
             orth[i][j]=orth_aux[i][j];
         }
     }
@@ -132,13 +132,13 @@ double* median_center( double **orth_aux,long size){
 
     if (size%2 == 0){
 
-        for (long i = 0; i < n_dim; i++){
+        for (int i = 0; i < n_dim; i++){
             ret[i]= (orth[size/2][i] + orth[size/2-1][i])/2;
 
         }
 
     } else{
-        for (long i = 0; i < n_dim; i++){
+        for (int i = 0; i < n_dim; i++){
             ret[i]= orth[size/2][i];
 
         }
