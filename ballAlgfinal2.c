@@ -26,7 +26,7 @@ double eucl(double *aux1, double *aux2){
 
     for(int i=0; i < n_dim; i++){
         aux=aux1[i]-aux2[i];
-        ret= ret+ aux*aux;
+        ret+= aux*aux;
     }
     return ret;
 }
@@ -34,7 +34,7 @@ double eucl(double *aux1, double *aux2){
 double inner(double *a, double *b){
     double ret=0.0;
     for(int i=0;i < n_dim; i++){
-        ret=ret+a[i]*b[i];
+        ret+= a[i]*b[i];
     }
     return ret;
 }
