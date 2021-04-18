@@ -220,11 +220,10 @@ void fit(struct tree *node, int* data_index, long size){
             ret2[aux2]=data_index[i];
             aux2++;
         }
+      free(orth_aux[i])
     }
 
     free(data_index);
-
-    for(long i = 0; i < size; i++) free(orth_aux[i]);
     free(orth_aux);
 
     node->L=(struct tree*) malloc(sizeof (struct tree));
