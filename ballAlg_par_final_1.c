@@ -164,9 +164,10 @@ double rad(double** data, double* center,long data_size){
 }
 
 
-void fit(struct tree *node, double** dataset, long size){
+void fit(struct tree *node, double** dataset, long size,int num_threads){
 
     node->id=id;
+  #pragma omp atomic
     id++;
     if(size<=1){
         node->center=dataset[0];
@@ -217,12 +218,21 @@ void fit(struct tree *node, double** dataset, long size){
     free(orth_aux);
 
     node->L=(struct tree*) malloc(sizeof (struct tree));
-
-    fit(node->L,ret1,aux1);
-
+      
     node->R=(struct tree*) malloc(sizeof (struct tree));
+        if(num_threads>1){
+#pragma omp task
+    fit(node->L,ret1,aux1,num_threads/2);
 
-    fit(node->R,ret2,aux2);
+    
+#pragma omp task
+    fit(node->R,ret2,aux2,num_threads-num_threads/2);
+        }
+        else{
+            fit(node->L,ret1,aux1,1);
+            
+            fit(node->R,ret2,aux2,1);
+        }
 
 }
 
@@ -264,14 +274,17 @@ int main(int argc, char *argv[]){
     int n_dim_aux = atoi(argv[1]);
     long np = atol(argv[2]);
     double exec_time;
-
+    int allThreads = omp_get_num_threads()
     exec_time = -omp_get_wtime();
 
     double **data = get_points(argc, argv, &n_dim_aux, &np);
     n_dim=n_dim_aux;
     struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
-
-    fit(aux,data, np);
+#pragma omp parallel
+  #pragma omp single
+    fit(aux,data, np,allThreads);
+  #pragma omp taskwait
+  
     exec_time += omp_get_wtime();
     fprintf(stderr, "%.1lf\n", exec_time);
 
@@ -280,4 +293,3 @@ int main(int argc, char *argv[]){
 //    traverse(aux);
     return 0;
 }
-
