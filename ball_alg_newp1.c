@@ -104,7 +104,7 @@ double rad(double** data, double* center,long data_size){
 }
 
 
-void fit(struct tree *node, double** dataset, long size){
+void fit(struct tree *node, double** dataset, long size, int num_threads){
 
     node->id=id;
     #pragma omp atomic
@@ -222,14 +222,19 @@ void fit(struct tree *node, double** dataset, long size){
     node->R=(struct tree*) malloc(sizeof (struct tree));
 
 
+if(num_threads>1){
+#pragma omp task
+    fit(node->L,ret1,aux1,num_threads/2);
+
 
 #pragma omp task
-    fit(node->L,ret1,aux1);
+    fit(node->R,ret2,aux2,num_threads-num_threads/2);
+        }
+        else{
+            fit(node->L,ret1,aux1,1);
 
-
-#pragma omp task
-    fit(node->R,ret2,aux2);
-        
+            fit(node->R,ret2,aux2,1);
+        }
 
     }
 
@@ -282,7 +287,7 @@ int main(int argc, char *argv[]){
 
 #pragma omp parallel
   #pragma omp single
-    fit(aux,data, np);
+    fit(aux,data, np,allThreads);
      #pragma omp taskwait
 
     exec_time += omp_get_wtime();
