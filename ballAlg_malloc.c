@@ -92,8 +92,9 @@ double* median_center( double **orth_aux,long size){
 
 double rad(double** data, double* center,long data_size){
     double ret=0;
+    double aux;
     for(long i=0; i<data_size;i++){
-        double aux=eucl(data[i],center);
+        aux=eucl(data[i],center);
         if(aux>ret){
             ret=aux;
         }
