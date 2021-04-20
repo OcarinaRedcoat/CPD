@@ -94,7 +94,7 @@ double* median_center( double **orth_aux,long size,int num_threads){
 double rad(double** data, double* center,long data_size){
     double ret=0;
     double aux;
-    #pragma omp parallel for private(aux) reduce(min:ret) num_threads(num_threads)
+    #pragma omp parallel for private(aux) num_threads(num_threads) reduce(min:ret)
     for(long i=0; i<data_size;i++){
         double aux=eucl(data[i],center);
         if(aux>ret){
@@ -106,7 +106,7 @@ double rad(double** data, double* center,long data_size){
 }
 
 
-void fit(struct tree *node, double** dataset, long size){
+void fit(struct tree *node, double** dataset, long size, int num_threads){
 
     node->id=id;
     #pragma omp atomic
@@ -289,7 +289,7 @@ int main(int argc, char *argv[]){
 
 #pragma omp parallel
   #pragma omp single
-    fit(aux,data, np);
+    fit(aux,data, np,allThreads);
      #pragma omp taskwait
 
     exec_time += omp_get_wtime();
