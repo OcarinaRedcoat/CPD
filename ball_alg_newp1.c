@@ -50,7 +50,7 @@ int comp(const void *a, const void *b){
         return 0;
 }
 
-double* median_center( double **orth_aux,long size,int num_threads){
+double* median_center( double **orth_aux,long size){
 
 
     double *_orth=(double *) malloc(n_dim * size * sizeof(double));
@@ -90,7 +90,7 @@ double* median_center( double **orth_aux,long size,int num_threads){
 
 
 
-double rad(double** data, double* center,long data_size,int num_threads){
+double rad(double** data, double* center,long data_size){
     double ret=0;
     double aux;
     for(long i=0; i<data_size;i++){
@@ -185,10 +185,10 @@ void fit(struct tree *node, double** dataset, long size, int num_threads){
 
 
 
-    node->center=median_center(orth_aux,size,num_threads);
+    node->center=median_center(orth_aux);
 
 
-    node->rad=rad(dataset,node->center,size,num_threads);
+    node->rad=rad(dataset,node->center,size);
 
     size_t size1=size/2;
 
