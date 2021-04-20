@@ -37,73 +37,6 @@ double inner(double *a, double *b){
     return ret;
 }
 
-double ** orth(double **dataset, long data_size){
-
-    double aux_dist= 0;
-    int a=0;
-    double auxx_dist;
-#pragma omp parallel for private(auxx_dist,aux_dist) num_threads(num_threads) if(num_threads>1)
-    for(long i=1;i<data_size;i++){
-        auxx_dist=eucl(dataset[0],dataset[i]);
-#pragma omp critical
-            if(auxx_dist>aux_dist){
-                aux_dist=auxx_dist;
-                a=i;
-            }
-    }
-    int b=0;
-    aux_dist=0;
-#pragma omp parallel for private(auxx_dist,aux_dist) num_threads(num_threads) if(num_threads>1)
-        for(long j=0;j<data_size;j++){
-
-        auxx_dist=eucl(dataset[a],dataset[j]);
-#pragma omp critical
-            if(auxx_dist>aux_dist){
-                aux_dist=auxx_dist;
-                b=j;
-            }
-    }
-
-    double **ret = (double **) malloc(data_size * sizeof(double *));
-
-    double b_a[n_dim];
-
-    double sub_aux[n_dim];
-
-
-    for(int j=0;j<n_dim;j++){
-        b_a[j]=dataset[b][j]-dataset[a][j];
-    }
-
-
-    //(b-a).(b-a)
-
-    double inner_b_a=inner(b_a,b_a);
-
-    double aux;
-#pragma omp parallel for private(dataset[a]) num_threads(num_threads) if(num_threads>1)
-    for(long i=0;i < data_size ;i++){
-      ret[i] = (double *)malloc(n_dim * sizeof(double));
-
-        //(p-a)
-        for(int j=0;j<n_dim;j++){
-            sub_aux[j]=dataset[i][j]-dataset[a][j];
-        }
-
-        aux=inner(sub_aux,b_a)/inner_b_a;
-
-        // (p-a).(b-a)/(b-a).(b-a) *(b-a) + a
-        for(int j=0;j<n_dim;j++){
-            ret[i][j]=  aux        *         b_a[j]    +      dataset[a][j];
-        }
-
-
-    }
-
-    return ret;
-
-}
-
 
 int comp(const void *a, const void *b){
 
@@ -117,14 +50,15 @@ int comp(const void *a, const void *b){
         return 0;
 }
 
-double* median_center( double **orth_aux,long size){
+double* median_center( double **orth_aux,long size,int num_threads){
 
 
+    double *_orth=(double *) malloc(n_dim * size * sizeof(double));
     double **orth = (double **) malloc(size * sizeof(double *));
-
-#pragma omp parallel for num_threads(num_threads) if(num_threads>1)
+    
+#pragma omp parallel for num_threads(num_threads)
     for(long i=0;i<size;i++){
-        orth[i] = (double *)malloc(n_dim * sizeof(double));
+        orth[i] = &_orth[i * n_dim];
         for(int j=0;j<n_dim;j++){
             orth[i][j]=orth_aux[i][j];
         }
@@ -149,8 +83,7 @@ double* median_center( double **orth_aux,long size){
 
         }
     }
-#pragma omp parallel for num_threads(num_threads) if(num_threads>1)
-    for(long i = 0; i < size; i++) free(orth[i]);
+    free(_orth);
     free(orth);
     return ret;
 
@@ -158,12 +91,12 @@ double* median_center( double **orth_aux,long size){
 
 
 
-double rad(double** data, double* center,long data_size,int num_threads){
+double rad(double** data, double* center,long data_size){
     double ret=0;
     double aux;
-#pragma omp parallel for private(aux) reduce(min:ret) num_threads(num_threads) if(num_threads>1)
+    #pragma omp parallel for private(aux) reduce(min:ret) num_threads(num_threads)
     for(long i=0; i<data_size;i++){
-        aux=eucl(data[i],center);
+        double aux=eucl(data[i],center);
         if(aux>ret){
             ret=aux;
         }
@@ -173,10 +106,10 @@ double rad(double** data, double* center,long data_size,int num_threads){
 }
 
 
-void fit(struct tree *node, double** dataset, long size,int num_threads){
+void fit(struct tree *node, double** dataset, long size){
 
     node->id=id;
-  #pragma omp atomic
+    #pragma omp atomic
     id++;
     if(size<=1){
         node->center=dataset[0];
@@ -190,9 +123,71 @@ void fit(struct tree *node, double** dataset, long size,int num_threads){
     }
     else{
 
-    double **orth_aux = orth(dataset, size);
 
-    node->center=median_center(orth_aux,size);
+        double aux_dist= 0;
+        long a=0;
+        long b=0;
+        double temp_dist;
+        for(long i=1;i<size;i++){
+            temp_dist=eucl(dataset[0],dataset[i]);
+                if(temp_dist>aux_dist){
+                    aux_dist=temp_dist;
+                    a=i;
+                }
+        }
+
+        aux_dist=0;
+        for(long j=0;j<size;j++){
+
+        temp_dist=eucl(dataset[a],dataset[j]);
+            if(temp_dist>aux_dist){
+                aux_dist=temp_dist;
+                b=j;
+            }
+        }
+
+        double *_orth_aux=(double *) malloc(n_dim * size * sizeof(double));
+        double **orth_aux = (double **) malloc(size * sizeof(double *));
+
+
+        double b_a[n_dim];
+
+        double sub_aux[n_dim];
+
+
+        for(int j=0;j<n_dim;j++){
+            b_a[j]=dataset[b][j]-dataset[a][j];
+        }
+
+
+        //(b-a).(b-a)
+
+        double inner_b_a=inner(b_a,b_a);
+
+        double aux;
+
+        for(long i=0;i < size ;i++){
+            orth_aux[i] = &_orth_aux[i * n_dim];
+
+
+            //(p-a)
+            for(int j=0;j<n_dim;j++){
+                sub_aux[j]=dataset[i][j]-dataset[a][j];
+            }
+
+            aux=inner(sub_aux,b_a)/inner_b_a;
+
+            // (p-a).(b-a)/(b-a).(b-a) *(b-a) + a
+            for(int j=0;j<n_dim;j++){
+                orth_aux[i][j]=  aux        *         b_a[j]    +      dataset[a][j];
+            }
+
+
+        }
+
+
+
+    node->center=median_center(orth_aux,size,num_threads);
 
 
     node->rad=rad(dataset,node->center,size,num_threads);
@@ -219,17 +214,17 @@ void fit(struct tree *node, double** dataset, long size,int num_threads){
             ret2[aux2]=dataset[i];
             aux2++;
         }
-      free(orth_aux[i]);
     }
 
     free(dataset);
-
+    free(_orth_aux);
     free(orth_aux);
-
     node->L=(struct tree*) malloc(sizeof (struct tree));
 
     node->R=(struct tree*) malloc(sizeof (struct tree));
-        if(num_threads>1){
+
+
+if(num_threads>1){
 #pragma omp task
     fit(node->L,ret1,aux1,num_threads/2);
 
@@ -243,7 +238,7 @@ void fit(struct tree *node, double** dataset, long size,int num_threads){
             fit(node->R,ret2,aux2,1);
         }
 
-}
+    }
 
 }
 
@@ -284,15 +279,18 @@ int main(int argc, char *argv[]){
     long np = atol(argv[2]);
     double exec_time;
     int allThreads = omp_get_num_threads();
+    printf("%d ",allThreads);
+
     exec_time = -omp_get_wtime();
 
     double **data = get_points(argc, argv, &n_dim_aux, &np);
     n_dim=n_dim_aux;
     struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
+
 #pragma omp parallel
   #pragma omp single
-    fit(aux,data, np,allThreads);
-  #pragma omp taskwait
+    fit(aux,data, np);
+     #pragma omp taskwait
 
     exec_time += omp_get_wtime();
     fprintf(stderr, "%.1lf\n", exec_time);
