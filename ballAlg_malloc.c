@@ -106,7 +106,6 @@ double rad(double** data, double* center,long data_size){
 void fit(struct tree *node, double** dataset, long size,int num_threads){
 
     node->id=id;
-#pragma omp atomic
     id++;
     if(size<=1){
         node->center=dataset[0];
