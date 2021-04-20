@@ -185,7 +185,7 @@ void fit(struct tree *node, double** dataset, long size, int num_threads){
 
 
 
-    node->center=median_center(orth_aux);
+    node->center=median_center(orth_aux,size);
 
 
     node->rad=rad(dataset,node->center,size);
