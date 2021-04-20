@@ -93,7 +93,6 @@ double* median_center( double **orth_aux,long size,int num_threads){
 double rad(double** data, double* center,long data_size,int num_threads){
     double ret=0;
     double aux;
-    #pragma omp parallel for private(aux) num_threads(num_threads) reduction(min:ret)
     for(long i=0; i<data_size;i++){
         double aux=eucl(data[i],center);
         if(aux>ret){
