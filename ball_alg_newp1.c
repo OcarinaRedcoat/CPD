@@ -224,11 +224,11 @@ void fit(struct tree *node, double** dataset, long size){
 
 
 #pragma omp task
-    fit(node->L,ret1,aux1,num_threads/2);
+    fit(node->L,ret1,aux1);
 
 
 #pragma omp task
-    fit(node->R,ret2,aux2,num_threads-num_threads/2);
+    fit(node->R,ret2,aux2);
         
 
     }
