@@ -36,10 +36,10 @@ long partition (double ** arr, long low, long high)
         if (arr[j][0] < pivot[0])
         {
             i++; // increment index of smaller element
-            swap(arr[i], arr[j]);
+            swap(&arr[i],& arr[j]);
         }
     }
-    swap(arr[i + 1], arr[high]);
+    swap(&arr[i + 1],& arr[high]);
     return (i + 1);
 }
 
