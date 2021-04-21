@@ -276,8 +276,8 @@ int main(int argc, char *argv[]){
     int n_dim_aux = atoi(argv[1]);
     long np = atol(argv[2]);
     double exec_time;
-    int allThreads = omp_get_num_procs();
-    printf("%d ",allThreads);
+    int allThreads = omp_get_max_threads();
+    printf("%d\n ",allThreads);
 
     exec_time = -omp_get_wtime();
 
