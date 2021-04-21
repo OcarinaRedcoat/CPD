@@ -82,19 +82,6 @@ double inner(double *a, double *b){
     return ret;
 }
 
-
-int comp(const void *a, const void *b){
-
-    double *aa = *(double * const *)a;
-    double *bb = *(double * const *)b;
-    if (aa[0] > bb[0])
-        return 1;
-      else if (aa[0] < bb[0])
-        return -1;
-      else
-        return 0;
-}
-
 double* median_center( double **orth_aux,long size){
 
 
@@ -238,16 +225,16 @@ void fit(struct tree *node, double** dataset, long size){
     double **ret1 = (double **) malloc(size1 * sizeof(double *));
 
 
-    size_t size2=size/2+1;
+    size1=size1+1;
 
-    double **ret2 = (double **) malloc(size2 * sizeof(double *));
+    double **ret2 = (double **) malloc(size1 * sizeof(double *));
 
     long aux1=0;
     long aux2=0;
     for(long i=0;i<size;i++){
         if(orth_aux[i][0]<node->center[0]){
 
-            ret1[aux1]= dataset[i];//ponteiro data[i]
+            ret1[aux1]= dataset[i];
             aux1++;
         }
 
@@ -312,8 +299,6 @@ int main(int argc, char *argv[]){
     int n_dim_aux = atoi(argv[1]);
     long np = atol(argv[2]);
     double exec_time;
-    int allThreads = omp_get_num_threads();
-//    printf("%d ",allThreads);
 
     exec_time = -omp_get_wtime();
 
