@@ -286,6 +286,7 @@ int main(int argc, char *argv[]){
     double **data = get_points(argc, argv, &n_dim_aux, &np);
     n_dim=n_dim_aux;
     struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
+    omp_set_nested(1);
 
 #pragma omp parallel
   #pragma omp single
