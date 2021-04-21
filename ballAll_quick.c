@@ -63,6 +63,7 @@ long id=0;
 
 
 double eucl(double *aux1, double *aux2){
+    //returns s
     double ret=0.0;
     double aux=0.0;
 
@@ -107,9 +108,6 @@ double* median_center( double **orth_aux,long size){
         }
     }
 
-
-
-    //qsort(orth, size, sizeof(*orth), comp);
 
     my_qsort(orth,0,size-1);
 
@@ -165,7 +163,7 @@ void fit(struct tree *node, double** dataset, long size){
     }
     else{
 
-
+// FIND A_B BY INDEX
         double aux_dist= 0;
         long a=0;
         long b=0;
@@ -187,7 +185,7 @@ void fit(struct tree *node, double** dataset, long size){
                 b=j;
             }
         }
-
+//COMPUTE ORTHOGONAL PROJECTION
         double *_orth_aux=(double *) malloc(n_dim * size * sizeof(double));
         double **orth_aux = (double **) malloc(size * sizeof(double *));
 
@@ -228,12 +226,13 @@ void fit(struct tree *node, double** dataset, long size){
         }
 
 
-
+//COMPUTE NODE'S MEDIAN CENTER
     node->center=median_center(orth_aux,size);
 
-
+////COMPUTE NODE'S RADIUS
     node->rad=rad(dataset,node->center,size);
 
+//DIVIDE THE POINTS INTO LEFT AND RIGTH NODE
     size_t size1=size/2;
 
     double **ret1 = (double **) malloc(size1 * sizeof(double *));
