@@ -1,21 +1,12 @@
-SOURCE = ballAlg.c	
-TARGET = ballAlg
+SEQSOURCE = ballAlg.c	
+SEQTARGET = ballAlg
+PARSOURCE = ballAlg-omp.c	
+PARTARGET = ballAlg-omp
 CC = gcc
 FLAGS = -fopenmp -O3 -lm
-#FLAGS = -Wall -Wextra -Wpedantic -Wformat
 
 all: ballAlg
 
-ballAlg: ballAlg.c
-	$(CC) $(SOURCE) -o $(TARGET) $(FLAGS)
-
-clean: 
-	@echo 
-	@echo ----  Cleaning project ...  ----
-	@echo 
-	rm -f $(TARGET) 
-	rm ballAlg2.c.opari.inc
-	rm opari.* 
-	rm *.txt
-	@echo
-	@echo ----  Very nice!  ----
+ballAlg: ballAlg.c ballAlg-omp.c
+	$(CC) $(SEQSOURCE) -o $(SEQTARGET) $(FLAGS)
+	$(CC) $(PARSOURCE) -o $(PARTARGET) $(FLAGS)
