@@ -56,7 +56,6 @@ double* median_center( double **orth_aux,long size,int num_threads){
     double *_orth=(double *) malloc(n_dim * size * sizeof(double));
     double **orth = (double **) malloc(size * sizeof(double *));
     
-#pragma omp parallel for num_threads(num_threads)
     for(long i=0;i<size;i++){
         orth[i] = &_orth[i * n_dim];
         for(int j=0;j<n_dim;j++){
