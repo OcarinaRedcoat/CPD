@@ -24,10 +24,10 @@ long partition (double ** arr, long low, long high)
         if (arr[j][0] < pivot[0])
         {
             i++; // increment index of smaller element
-            swap(arr[i], arr[j]);
+            swap(&arr[i], &arr[j]);
         }
     }
-    swap(arr[i + 1], arr[high]);
+    swap(&arr[i + 1], &arr[high]);
     return (i + 1);
 }
 
@@ -314,7 +314,7 @@ int main(int argc, char *argv[]){
     long np = atol(argv[2]);
     double exec_time;
     int allThreads = omp_get_num_threads();
-    printf("%d ",allThreads);
+//    printf("%d ",allThreads);
 
     exec_time = -omp_get_wtime();
 
@@ -330,6 +330,6 @@ int main(int argc, char *argv[]){
 
     printf("%d %ld\n",n_dim_aux,id);
 
-//    traverse(aux);
+    traverse(aux);
     return 0;
 }
