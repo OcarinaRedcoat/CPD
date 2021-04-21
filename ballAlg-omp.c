@@ -238,9 +238,9 @@ void fit(struct tree *node, double** dataset, long size, int num_threads){
     double **ret1 = (double **) malloc(size1 * sizeof(double *));
 
 
-    size_t size2=size/2+1;
+    size1=size1+1;
 
-    double **ret2 = (double **) malloc(size2 * sizeof(double *));
+    double **ret2 = (double **) malloc(size1 * sizeof(double *));
 
     long aux1=0;
     long aux2=0;
