@@ -54,16 +54,23 @@ void my_qsort(double** arr, long low, long high,int num_threads)
         // Separately sort elements before
         // partition and after partition
         if(num_threads>1){
-#pragma omp task priority(1)
+#pragma omp taskgroup
+{
+            
+#pragma omp task
             my_qsort(arr, low, pi - 1,num_threads-num_threads/2);
-#pragma omp task priority(1)
+#pragma omp task 
             my_qsort(arr, pi + 1, high,num_threads-num_threads/2);
+            
+}
+        
         }
         else{
 
             my_qsort(arr, low, pi - 1,1);
             my_qsort(arr, pi + 1, high,1);
         }
+        
         
     }
 }
@@ -100,7 +107,7 @@ int comp(const void *a, const void *b){
         return 0;
 }
 
-double* median_center( double **orth_aux,long size){
+double* median_center( double **orth_aux,long size,int num_threads){
 
 
     double *_orth=(double *) malloc(n_dim * size * sizeof(double));
@@ -115,7 +122,7 @@ double* median_center( double **orth_aux,long size){
 
 
 
-    qsort(orth, size, sizeof(*orth), comp);
+    my_qsort(orth, 0, size-1,num_threads);
 
     double *ret = (double *) malloc(n_dim * sizeof(double));
 
@@ -235,7 +242,7 @@ void fit(struct tree *node, double** dataset, long size, int num_threads){
 
 
 
-    node->center=median_center(orth_aux,size);
+    node->center=median_center(orth_aux,size,num_threads);
 
 
     node->rad=rad(dataset,node->center,size);
