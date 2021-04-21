@@ -165,7 +165,7 @@ void fit(struct tree *node, double** dataset, long size, int num_threads){
         double inner_b_a=inner(b_a,b_a);
 
         double aux;
-    #pragma omp parallel for num_threads(num_threads) reduction(min:ret)
+    #pragma omp parallel for num_threads(num_threads)
         for(long i=0;i < size ;i++){
             orth_aux[i] = &_orth_aux[i * n_dim];
 
