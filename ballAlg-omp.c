@@ -94,19 +94,6 @@ double inner(double *a, double *b){
     return ret;
 }
 
-
-int comp(const void *a, const void *b){
-
-    double *aa = *(double * const *)a;
-    double *bb = *(double * const *)b;
-    if (aa[0] > bb[0])
-        return 1;
-      else if (aa[0] < bb[0])
-        return -1;
-      else
-        return 0;
-}
-
 double* median_center( double **orth_aux,long size,int num_threads){
 
 
@@ -144,7 +131,6 @@ double* median_center( double **orth_aux,long size,int num_threads){
     return ret;
 
 }
-
 
 
 double rad(double** data, double* center,long data_size){
@@ -341,7 +327,6 @@ int main(int argc, char *argv[]){
     double **data = get_points(argc, argv, &n_dim_aux, &np);
     n_dim=n_dim_aux;
     struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
-    omp_set_nested(1);
 
 #pragma omp parallel
   #pragma omp single
@@ -353,6 +338,6 @@ int main(int argc, char *argv[]){
 
     printf("%d %ld\n",n_dim_aux,id);
 
-//    traverse(aux);
+    traverse(aux);
     return 0;
 }
