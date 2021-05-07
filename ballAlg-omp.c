@@ -329,7 +329,7 @@ int main(int argc, char *argv[]){
 
 #pragma omp parallel
   #pragma omp single
-    fit(aux,data, np,allThreads,0);
+    fit(aux,data, np,allThreads,(long)0);
      #pragma omp taskwait
 
     exec_time += omp_get_wtime();
