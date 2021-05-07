@@ -59,7 +59,7 @@ struct tree{
 };
 
 long n_dim;
-long id=0;
+long count=0;
 
 
 double eucl(double *aux1, double *aux2){
@@ -134,10 +134,10 @@ double rad(double** data, double* center,long data_size){
 }
 
 
-void fit(struct tree *node, double** dataset, long size){
+void fit(struct tree *node, double** dataset, long size,long id){
 
     node->id=id;
-    id++;
+    count++;
     if(size<=1){
         node->center=dataset[0];
         free(dataset);
@@ -252,9 +252,9 @@ void fit(struct tree *node, double** dataset, long size){
     node->R=(struct tree*) malloc(sizeof (struct tree));
 
 
-    fit(node->L,ret1,aux1);
+    fit(node->L,ret1,aux1,2*id+1);
 
-    fit(node->R,ret2,aux2);
+    fit(node->R,ret2,aux2,2*id+2);
 
 
     }
@@ -307,7 +307,7 @@ int main(int argc, char *argv[]){
     struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
 
 
-    fit(aux,data, np);
+    fit(aux,data, np,(long)0);
 
     exec_time += omp_get_wtime();
     fprintf(stderr, "%.1lf\n", exec_time);
