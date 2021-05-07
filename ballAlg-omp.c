@@ -335,7 +335,7 @@ int main(int argc, char *argv[]){
     exec_time += omp_get_wtime();
     fprintf(stderr, "%.1lf\n", exec_time);
 
-    printf("%d %ld\n",n_dim_aux,id);
+    printf("%d %ld\n",n_dim_aux,count);
 
     traverse(aux);
     return 0;
