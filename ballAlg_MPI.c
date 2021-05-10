@@ -288,8 +288,8 @@ void visit(struct tree *node) {
 void traverse(struct tree *node) {
 
 puts("traverse");
-printf("rad_t: %lf",node->rad);
-printf("son_t: %d",node->L->id);
+printf("rad_t: %lf \n",node->rad);
+printf("son_t: %d \n",node->L->id);
   if (node->rad == -1){
         return;
     }
