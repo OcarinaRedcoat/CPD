@@ -215,7 +215,6 @@ void fit(struct tree *node, double** dataset, long size,long id){
     node->center=median_center(orth_aux,size);
 
     node->rad=rad(dataset,node->center,size);
-	printf(" rad: %lf", node->rad);
 
     size_t size1=size/2;
 
@@ -290,8 +289,9 @@ void visit(struct tree *node) {
 void traverse(struct tree *node) {
 
 puts("traverse");
-printf("rad_t: %lf \n",node->rad);
 printf("son_t: %ld \n",node->L->id);
+printf("rad_t: %lf \n",node->rad);
+
   if (node->rad == -1){
         return;
     }
