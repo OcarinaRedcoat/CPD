@@ -224,8 +224,9 @@ void fit(struct tree *node, double** dataset, long size,long id){
 
     double **ret1 = (double **) malloc(size1 * sizeof(double *));
 
-
-    size1=size1+1;
+    if(size%2!=0){
+        size1=size1+1;
+    }
 
     double **ret2 = (double **) malloc(size1 * sizeof(double *));
 
