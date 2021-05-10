@@ -363,7 +363,6 @@ struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
     exec_time += MPI_Wtime();
     fprintf(stderr, "%.1lf\n", exec_time);
     printf("%d \n",n_dim);
-	traverse(aux);
  }
    traverse(aux);
   MPI_Finalize();
