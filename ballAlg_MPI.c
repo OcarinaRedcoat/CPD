@@ -211,6 +211,9 @@ void fit(struct tree *node, double** dataset, long size,long id){
 
         }
 
+	    
+	    
+	    
 
     node->center=median_center(orth_aux,size);
 
