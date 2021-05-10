@@ -341,7 +341,6 @@ struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
 
         exec_time = - MPI_Wtime();
         data = get_points(argc, argv, &n_dim, &np);
-        struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
 
         fit(aux,data, np,0);
     }
@@ -366,7 +365,7 @@ struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
     printf("%d \n",n_dim);
 	traverse(aux);
  }
-   // traverse(aux);
+   traverse(aux);
   MPI_Finalize();
   return 0;
 }
