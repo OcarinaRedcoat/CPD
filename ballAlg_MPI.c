@@ -7,7 +7,6 @@
 
 #include "gen_points.c"
 
-#define MYTAG 123
 #define WORLD MPI_COMM_WORLD
 int n_dim;
 int nprocs;
@@ -244,25 +243,25 @@ void fit(struct tree *node, double** dataset, long size,long id){
     free(dataset);
     free(_orth_aux);
     free(orth_aux);
+    node->L=(struct tree*) malloc(sizeof (struct tree));
+    node->R=(struct tree*) malloc(sizeof (struct tree));
 
 
-if(id<nprocs-2){
+if(id<=nprocs-2){
+    node->R->id=2*id+2;
+    //to the tranverse function not print this node
+    node->R->rad=-1;
     //aux
     MPI_Send(aux2,1,MPI_LONG,(id+1),1,WORLD);
     //ret
     MPI_Send(ret2,aux2*n_dim,MPI_DOUBLE,(id+1),2,WORLD);
-
-
-
-    node->L=(struct tree*) malloc(sizeof (struct tree));
 
     fit(node->L,ret1,aux1,2*id+1);
 
 
     }
 else{
-        node->L=(struct tree*) malloc(sizeof (struct tree));
-        node->R=(struct tree*) malloc(sizeof (struct tree));
+        
         fit(node->L,ret1,aux1,2*id+1);
         fit(node->R,ret2,aux2,2*id+2);
 
@@ -333,9 +332,7 @@ int main(int argc, char *argv[]){
 
         fit(aux,data, np,0);
     }
-    for(int i=1; i<nprocs;i++){
-
-    if(me==i){
+    else{
         MPI_recv(np,1,MPI_LONG,MPI_ANY_SOURCE,1,WORLD);
         double *_data = (double *) malloc(n_dim * np * sizeof(double));
         data = (double **) malloc(np * sizeof(double *));
@@ -346,7 +343,7 @@ int main(int argc, char *argv[]){
 
         fit(aux,data,np,me*2);
     }
-    }
+    
     MPI_Barrier(WORLD);
 
 
