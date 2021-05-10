@@ -254,7 +254,7 @@ if(id<=nprocs-2){
     //aux
     MPI_Send(&aux2,1,MPI_LONG,(id+1),1,WORLD);
     //ret
-    MPI_Send(ret2,aux2*n_dim,MPI_DOUBLE,(id+1),2,WORLD);
+    MPI_Send(&ret2,aux2*n_dim,MPI_DOUBLE,(id+1),2,WORLD);
 
     fit(node->L,ret1,aux1,2*id+1);
 
@@ -311,6 +311,7 @@ int main(int argc, char *argv[]){
     double **data;
     int me;
     double exec_time;
+    
 
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
@@ -319,7 +320,7 @@ int main(int argc, char *argv[]){
 
     n_dim = atoi(argv[1]);
 
-    MPI_Bcast(n_dim,1,MPI_LONG,0,WORLD);
+    MPI_Bcast(&n_dim,1,MPI_LONG,0,WORLD);
 
 
     if(me==0){
@@ -333,13 +334,14 @@ int main(int argc, char *argv[]){
         fit(aux,data, np,0);
     }
     else{
-        MPI_Recv(np,1,MPI_LONG,MPI_ANY_SOURCE,1,WORLD);
+        MPI_Status status[2];
+        MPI_Recv(&np,1,MPI_LONG,MPI_ANY_SOURCE,1,WORLD, &status[0]);
         double *_data = (double *) malloc(n_dim * np * sizeof(double));
         data = (double **) malloc(np * sizeof(double *));
         for(long i = 0; i < np; i++)
             data[i] = &_data[i * n_dim];
 
-        MPI_recv(&data,np*n_dim,MPI_DOUBLE,MPI_ANY_SOURCE,2,WORLD);
+        MPI_Recv(&data,np*n_dim,MPI_DOUBLE,MPI_ANY_SOURCE,2,WORLD, &status[1]);
 
         fit(aux,data,np,me*2);
     }
