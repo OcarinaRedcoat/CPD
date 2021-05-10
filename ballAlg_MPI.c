@@ -252,7 +252,7 @@ if(id<=nprocs-2){
     //to the tranverse function not print this node
     node->R->rad=-1;
     //aux
-    MPI_Send(aux2,1,MPI_LONG,(id+1),1,WORLD);
+    MPI_Send(&aux2,1,MPI_LONG,(id+1),1,WORLD);
     //ret
     MPI_Send(ret2,aux2*n_dim,MPI_DOUBLE,(id+1),2,WORLD);
 
@@ -319,7 +319,7 @@ int main(int argc, char *argv[]){
 
     n_dim = atoi(argv[1]);
 
-    MPI_Bcast(n_dim,1,MPI_INT,0,WORLD);
+    MPI_Bcast(n_dim,1,MPI_LONG,0,WORLD);
 
 
     if(me==0){
@@ -333,7 +333,7 @@ int main(int argc, char *argv[]){
         fit(aux,data, np,0);
     }
     else{
-        MPI_recv(np,1,MPI_LONG,MPI_ANY_SOURCE,1,WORLD);
+        MPI_Recv(np,1,MPI_LONG,MPI_ANY_SOURCE,1,WORLD);
         double *_data = (double *) malloc(n_dim * np * sizeof(double));
         data = (double **) malloc(np * sizeof(double *));
         for(long i = 0; i < np; i++)
