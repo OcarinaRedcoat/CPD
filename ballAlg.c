@@ -53,7 +53,7 @@ void my_qsort(double** arr, long low, long high)
 struct tree{
     double* center;
     double rad;
-    int id;
+    long id;
     struct tree *L;
     struct tree *R;
 };
@@ -264,14 +264,14 @@ void fit(struct tree *node, double** dataset, long size,long id){
 
 void visit(struct tree *node) {
 
-  printf("%d %d %d %f ",node->id,node->L->id,node->R->id, node->rad);
+  printf("%ld %ld %ld %lf ",node->id,node->L->id,node->R->id, node->rad);
 
   for(int i=0; i<n_dim-1;i++){
-      printf("%f ",node->center[i]);
+      printf("%lf ",node->center[i]);
 
   }
 
-  printf("%f\n",node->center[n_dim-1]);
+  printf("%lf\n",node->center[n_dim-1]);
 }
 
 void traverse(struct tree *node) {
