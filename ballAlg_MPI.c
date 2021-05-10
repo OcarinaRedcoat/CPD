@@ -243,6 +243,8 @@ void fit(struct tree *node, double** dataset, long size,long id){
     free(dataset);
     free(_orth_aux);
     free(orth_aux);
+	
+printf("rad: %lf \n",node->rad);
     node->L=(struct tree*) malloc(sizeof (struct tree));
     node->R=(struct tree*) malloc(sizeof (struct tree));
 
@@ -254,8 +256,9 @@ if(id<=nprocs-2){
     //aux
     MPI_Send(&aux2,1,MPI_LONG,(id+1),1,WORLD);
     //ret
-    MPI_Send(&ret2,aux2*n_dim,MPI_DOUBLE,(id+1),2,WORLD);
-
+    MPI_Send(&(ret2[0][0]),aux2*n_dim,MPI_DOUBLE,(id+1),2,WORLD);
+	printf("data: %f \n",ret2[0][0]);
+	printf("size_send : %ld \n", aux2);
     fit(node->L,ret1,aux1,2*id+1);
 
 
@@ -285,6 +288,9 @@ void visit(struct tree *node) {
 
 void traverse(struct tree *node) {
 
+puts("traverse");
+printf("rad_t: %lf",node->rad);
+printf("son_t: %d",node->L->id);
   if (node->rad == -1){
         return;
     }
@@ -316,16 +322,19 @@ int main(int argc, char *argv[]){
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
     MPI_Comm_rank(MPI_COMM_WORLD, &me);
-    struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
+puts("one");
+    
+struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
 
     n_dim = atoi(argv[1]);
 
     MPI_Bcast(&n_dim,1,MPI_LONG,0,WORLD);
-
+printf("%d \n ",n_dim);
+fflush(stdout);
 
     if(me==0){
         np = atol(argv[2]);
-
+puts("two");
 
         exec_time = - MPI_Wtime();
         data = get_points(argc, argv, &n_dim, &np);
@@ -336,13 +345,14 @@ int main(int argc, char *argv[]){
     else{
         MPI_Status status[2];
         MPI_Recv(&np,1,MPI_LONG,MPI_ANY_SOURCE,1,WORLD, &status[0]);
-        double *_data = (double *) malloc(n_dim * np * sizeof(double));
+printf("size %ld \n ",np);
+double *_data = (double *) malloc(n_dim * np * sizeof(double));
         data = (double **) malloc(np * sizeof(double *));
         for(long i = 0; i < np; i++)
             data[i] = &_data[i * n_dim];
 
-        MPI_Recv(&data,np*n_dim,MPI_DOUBLE,MPI_ANY_SOURCE,2,WORLD, &status[1]);
-
+        MPI_Recv(&(data[0][0]),np*n_dim,MPI_DOUBLE,MPI_ANY_SOURCE,2,WORLD, &status[1]);
+printf("data_recv: %f \n ",data[0][0]); 
         fit(aux,data,np,me*2);
     }
     
@@ -352,11 +362,11 @@ int main(int argc, char *argv[]){
     if(me==0){
     exec_time += MPI_Wtime();
     fprintf(stderr, "%.1lf\n", exec_time);
-    printf("%d %d\n",n_dim,10);
-    }
-
-    traverse(aux);
-
+    printf("%d \n",n_dim);
+	traverse(aux);
+ }
+puts("final");
+   // traverse(aux);
   MPI_Finalize();
   return 0;
 }
