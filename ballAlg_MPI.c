@@ -139,6 +139,11 @@ double rad(double** data, double* center,long data_size){
 
 void fit(struct tree *node, double** dataset, long size,long id){
     node->id=id;
+	if(id==1){
+	printf("%ld  %ld  \n",dataset[0][0],dataset[0][1]);
+	printf("%ld  %ld  \n",dataset[1][0],dataset[1][1])
+	
+	}
     if(size<=1){
         node->center=dataset[0];
         free(dataset);
