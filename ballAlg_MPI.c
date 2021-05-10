@@ -259,6 +259,9 @@ if(id<=nprocs-2){
     //ret
     MPI_Send(&(ret2[0][0]),aux2*n_dim,MPI_DOUBLE,(id+1),2,WORLD);
 	
+	printf("%ld \n",aux1);
+	printf("%lf %lf\n",ret1[1][0],ret1[1][1]);
+
     fit(node->L,ret1,aux1,2*id+1);
 
 
@@ -288,9 +291,6 @@ void visit(struct tree *node) {
 
 void traverse(struct tree *node) {
 
-puts("traverse");
-printf("son_t: %ld \n",node->L->id);
-printf("rad_t: %lf \n",node->rad);
 
   if (node->rad == -1){
         return;
