@@ -139,11 +139,7 @@ double rad(double** data, double* center,long data_size){
 
 void fit(struct tree *node, double** dataset, long size,long id){
     node->id=id;
-	if(id==1){
-	printf("%lf  %lf  \n",dataset[0][0],dataset[0][1]);
-	printf("%lf  %lf  \n",dataset[1][0],dataset[1][1]);
 	
-	}
     if(size<=1){
         node->center=dataset[0];
         free(dataset);
@@ -219,6 +215,7 @@ void fit(struct tree *node, double** dataset, long size,long id){
     node->center=median_center(orth_aux,size);
 
     node->rad=rad(dataset,node->center,size);
+	printf(" rad: %lf", node->rad);
 
     size_t size1=size/2;
 
