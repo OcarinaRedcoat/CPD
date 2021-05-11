@@ -319,7 +319,7 @@ int main(int argc, char *argv[]){
     double **data;
     int me;
     double exec_time;
-long global_count=0;
+long global_count;
     
 
     MPI_Init(&argc, &argv);
@@ -356,7 +356,7 @@ struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
     }
     
     MPI_Barrier(WORLD);
-
+global_count=0;
 MPI_Reduce(&count,&global_count,1,MPI_LONG,MPI_SUM,0,WORLD);
 
     if(me==0){
