@@ -261,10 +261,6 @@ if(id<=nprocs-2){
     MPI_Send(&aux2,1,MPI_LONG,(id+1),1,WORLD);
     //ret
     MPI_Send(&(ret2[0][0]),aux2*n_dim,MPI_DOUBLE,(id+1),2,WORLD);
-	
-	printf("%ld \n",aux1);
-	printf("%lf %lf\n",ret1[1][0],ret1[1][1]);
-
     fit(node->L,ret1,aux1,2*id+1);
 
 
@@ -364,6 +360,8 @@ struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
     fprintf(stderr, "%.1lf\n", exec_time);
     printf("%d \n",n_dim);
  }
+MPI_Barrier(WORLD);
+
    traverse(aux);
   MPI_Finalize();
   return 0;
