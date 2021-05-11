@@ -10,6 +10,7 @@
 #define WORLD MPI_COMM_WORLD
 int n_dim;
 int nprocs;
+long count;
 
 void swap(double** a, double** b)
 {
@@ -139,6 +140,7 @@ double rad(double** data, double* center,long data_size){
 
 void fit(struct tree *node, double** dataset, long size,long id){
     node->id=id;
+	count++;
 	
     if(size<=1){
         node->center=dataset[0];
@@ -354,11 +356,15 @@ struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
     
     MPI_Barrier(WORLD);
 
+	
 
     if(me==0){
+long global_count=0;
+MPI_Reduce(&count,&global_count,1,MPI_LONG,MPI_SUM,0,WORLD);
+	    
     exec_time += MPI_Wtime();
     fprintf(stderr, "%.1lf\n", exec_time);
-    printf("%d \n",n_dim);
+    printf("%d %ld \n",n_dim,global_count);
  }
 MPI_Barrier(WORLD);
 
