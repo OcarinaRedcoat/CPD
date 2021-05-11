@@ -10,7 +10,7 @@
 #define WORLD MPI_COMM_WORLD
 int n_dim;
 int nprocs;
-long count;
+long count=0;
 
 void swap(double** a, double** b)
 {
@@ -140,7 +140,7 @@ double rad(double** data, double* center,long data_size){
 
 void fit(struct tree *node, double** dataset, long size,long id){
     node->id=id;
-	count++;
+count++;
 	
     if(size<=1){
         node->center=dataset[0];
