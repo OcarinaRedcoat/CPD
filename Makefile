@@ -11,7 +11,7 @@ FLAGS = -fopenmp -O3 -lm
 
 all: ballAlg
 
-ballAlg: ballAlg.c ballAlg-omp.c
+ballAlg: ballAlg.c ballAlg-omp.c ballAlg-mpi.c
 	$(CC) $(SEQSOURCE) -o $(SEQTARGET) $(FLAGS)
 	$(CC) $(PARSOURCE) -o $(PARTARGET) $(FLAGS)
 	$(MPICC) $(MPISOURCE)  -o $(MPITARGET) $(MPIGLAGS)
