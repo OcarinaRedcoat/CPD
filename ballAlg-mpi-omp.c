@@ -279,9 +279,9 @@ void fit(struct tree *node, double **dataset, long size, long id,int threads)
             MPI_Send(&(ret2[0][0]), aux2 * n_dim, MPI_DOUBLE, (id + 1), 2, WORLD);
             free(ret2[0]);
             free(ret2);
-            fit(node->L, ret1, aux1, 2 * id + 1);
+            fit(node->L, ret1, aux1, 2 * id + 1,threads);
         }
-        else if(threads>=1){
+        else if(threads>1){
             
 #pragma omp task
     fit(node->L,ret1,aux1,2*id+1,num_threads/2);
@@ -292,8 +292,8 @@ void fit(struct tree *node, double **dataset, long size, long id,int threads)
         else
         {
 
-            fit(node->L, ret1, aux1, 2 * id + 1);
-            fit(node->R, ret2, aux2, 2 * id + 2);
+            fit(node->L, ret1, aux1, 2 * id + 1,1);
+            fit(node->R, ret2, aux2, 2 * id + 2,1);
         }
     }
 }
@@ -356,10 +356,10 @@ int main(int argc, char *argv[])
         long np = atol(argv[2]);
 
         exec_time = -MPI_Wtime();
-        double **data = get_points(argc, argv, &n_dim, &np,allThreads);
+        double **data = get_points(argc, argv, &n_dim, &np);
     #pragma omp parallel
   #pragma omp single
-        fit(aux, data, np, 0);
+        fit(aux, data, np, 0,allThreads);
              #pragma omp taskwait
 
     }
