@@ -13,17 +13,17 @@ int n_dim;
 int nprocs;
 long count = 0;
 
-void swap(double **a, double **b)
+void swap(double** a, double** b)
 {
-    double *temp = *a;
+    double* temp = *a;
     *a = *b;
     *b = temp;
 }
 
-long partition(double **arr, long low, long high)
+long partition (double ** arr, long low, long high)
 {
-    double *pivot = arr[high]; // pivot
-    long i = (low - 1);        // Index of smaller element and indicates the right position of pivot found so far
+    double* pivot = arr[high]; // pivot
+    long i = (low - 1); // Index of smaller element and indicates the right position of pivot found so far
 
     for (long j = low; j <= high - 1; j++)
     {
@@ -31,14 +31,14 @@ long partition(double **arr, long low, long high)
         if (arr[j][0] < pivot[0])
         {
             i++; // increment index of smaller element
-            swap(&arr[i], &arr[j]);
+            swap(&arr[i],& arr[j]);
         }
     }
-    swap(&arr[i + 1], &arr[high]);
+    swap(&arr[i + 1],& arr[high]);
     return (i + 1);
 }
 
-void my_qsort(double **arr, long low, long high)
+void my_qsort(double** arr, long low, long high,int num_threads)
 {
     if (low < high)
     {
@@ -48,9 +48,49 @@ void my_qsort(double **arr, long low, long high)
 
         // Separately sort elements before
         // partition and after partition
-        my_qsort(arr, low, pi - 1);
-        my_qsort(arr, pi + 1, high);
+        if(num_threads>1){
+#pragma omp taskgroup
+{
+            
+#pragma omp task
+            my_qsort(arr, low, pi - 1,num_threads-num_threads/2);
+#pragma omp task 
+            my_qsort(arr, pi + 1, high,num_threads-num_threads/2);
+            
+}
+        
+        }
+        else{
+
+            my_qsort(arr, low, pi - 1,1);
+            my_qsort(arr, pi + 1, high,1);
+        }
+        
+        
     }
+}
+
+double eucl(double *aux1, double *aux2){
+    double ret=0.0;
+    double aux=0.0;
+
+    for(int i=0; i < n_dim; i++){
+        aux=aux1[i]-aux2[i];
+        ret+= aux*aux;
+    }
+    return ret;
+}
+
+
+double eucl(double *aux1, double *aux2){
+    double ret=0.0;
+    double aux=0.0;
+
+    for(int i=0; i < n_dim; i++){
+        aux=aux1[i]-aux2[i];
+        ret+= aux*aux;
+    }
+    return ret;
 }
 
 
@@ -102,7 +142,7 @@ double *median_center(double **orth_aux, long size, int num_threads)
         }
     }
 
-    my_qsort(orth, 0, size-1);
+    my_qsort(orth, 0, size-1,num_threads);
 
     double *ret = (double *)malloc(n_dim * sizeof(double));
 
