@@ -176,7 +176,7 @@ count++;
             }
         }
         double *_orth_aux=(double *) malloc(n_dim * size * sizeof(double));
-        double **orth_aux = (double **) malloc(size * sizeof(double *));
+        double *_orth_aux=(double *) malloc(n_dim * size * sizeof(double));
 
 
         double b_a[n_dim];
@@ -224,12 +224,21 @@ count++;
     size_t size1=size/2;
 
     double **ret1 = (double **) malloc(size1 * sizeof(double *));
+	    double *_ret1 = (double *) malloc(n_dim*size1 * sizeof(double *));
+    for(long i=0;i < size1 ;i++)
+   	 ret1[i] = &_ret1[i * n_dim];
+	    
+
 
     if(size%2!=0){
         size1=size1+1;
     }
 
     double **ret2 = (double **) malloc(size1 * sizeof(double *));
+	    double *_ret2 = (double *) malloc(n_dim*size1 * sizeof(double *));
+	    for(long i=0;i < size1 ;i++)
+   	 ret2[i] = &_ret2[i * n_dim];
+
 
     long aux1=0;
     long aux2=0;
@@ -245,7 +254,7 @@ count++;
             aux2++;
         }
     }
-
+//free(dataset[0]);
     free(dataset);
     free(_orth_aux);
     free(orth_aux);
