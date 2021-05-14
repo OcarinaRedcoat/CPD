@@ -319,7 +319,6 @@ void traverse(struct tree *node) {
 int main(int argc, char *argv[]){
 
     long np;
-    double **data;
     int me;
     double exec_time;
 long global_count;
@@ -342,7 +341,7 @@ struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
 
 
         exec_time = - MPI_Wtime();
-        data = get_points(argc, argv, &n_dim, &np);
+        double **data  = get_points(argc, argv, &n_dim, &np);
 
         fit(aux,data, np,0);
     }
@@ -350,7 +349,7 @@ struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
         MPI_Status status[2];
         MPI_Recv(&np,1,MPI_LONG,MPI_ANY_SOURCE,1,WORLD, &status[0]);
 	double *_data = (double *) malloc(n_dim * np * sizeof(double));
-        data = (double **) malloc(np * sizeof(double *));
+        double data = (double **) malloc(np * sizeof(double *));
         for(long i = 0; i < np; i++)
             data[i] = &_data[i * n_dim];
 
