@@ -236,12 +236,12 @@ count++;
     for(long i=0;i<size;i++){
         if(orth_aux[i][0]<node->center[0]){
 
-            ret1[aux1]= &(dataset[i]);
+            &ret1[aux1]= (dataset[i]);
             aux1++;
         }
 
         else{
-            ret2[aux2]=&(dataset[i]);
+            &ret2[aux2]=(dataset[i]);
             aux2++;
         }
     }
