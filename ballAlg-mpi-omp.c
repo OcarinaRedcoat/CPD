@@ -331,7 +331,7 @@ int main(int argc, char *argv[])
     int me;
     double exec_time;
     long global_count;
-    int provided=0;
+    int provided=1;
 
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
@@ -345,7 +345,7 @@ int main(int argc, char *argv[])
 
     if (me == 0)
     {
-        printf("threads: %d", allThreads);
+        printf("threads: %d  procs: %d \n", allThreads, nprocs);
         long np = atol(argv[2]);
 
         exec_time = -MPI_Wtime();
