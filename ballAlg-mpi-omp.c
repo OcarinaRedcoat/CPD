@@ -159,6 +159,7 @@ double rad(double **data, double *center, long data_size)
 void fit(struct tree *node, double **dataset, long size, long id,int threads)
 {
     node->id = id;
+    #pragma omp atomic
     count++;
 
     if (size <= 1)
