@@ -299,6 +299,7 @@ void visit(struct tree *node) {
   }
 
   printf("%lf\n",node->center[n_dim-1]);
+fflush(stdout);
 }
 
 void traverse(struct tree *node) {
@@ -377,6 +378,7 @@ MPI_Reduce(&count,&global_count,1,MPI_LONG,MPI_SUM,0,WORLD);
     exec_time += MPI_Wtime();
     fprintf(stderr, "%.1lf\n", exec_time);
     printf("%d %ld \n",n_dim,global_count);
+	fflush(stdout);
  }
 MPI_Barrier(WORLD);
 
