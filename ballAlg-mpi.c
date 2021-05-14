@@ -358,8 +358,8 @@ struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
         fit(aux,data, np,0);
     }
 	
-MPI_Barrier(WORLD);
-    if(me!=0){
+
+    else{
 	long np;
         MPI_Status status[2];
         MPI_Recv(&np,1,MPI_LONG,MPI_ANY_SOURCE,1,WORLD, &status[0]);
@@ -386,8 +386,18 @@ MPI_Reduce(&count,&global_count,1,MPI_LONG,MPI_SUM,0,WORLD);
 	fflush(stdout);
  }
 MPI_Barrier(WORLD);
-
-   traverse(aux);
+	
+	
+rank = 0;
+while (rank < nprocs) {
+   if (me == rank) {
+       traverse(aux);
+       fflush (stdout);
+   }
+   rank ++;
+   MPI_Barrier ();
+}
+   
   MPI_Finalize();
   return 0;
 }
