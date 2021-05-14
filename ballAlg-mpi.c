@@ -365,7 +365,7 @@ struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
 	 
 
         MPI_Recv(&(data[0][0]),np*n_dim,MPI_DOUBLE,MPI_ANY_SOURCE,2,WORLD, &status[1]);
-        fit(aux,data,np,me*2);
+        fit(aux,data,np,(long)me*2);
     }
     
     MPI_Barrier(WORLD);
