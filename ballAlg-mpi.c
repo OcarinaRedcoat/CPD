@@ -176,7 +176,7 @@ count++;
             }
         }
         double *_orth_aux=(double *) malloc(n_dim * size * sizeof(double));
-        double *_orth_aux=(double *) malloc(n_dim * size * sizeof(double));
+        double **orth_aux = (double **) malloc(size * sizeof(double *));
 
 
         double b_a[n_dim];
