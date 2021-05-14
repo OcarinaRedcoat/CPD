@@ -357,6 +357,8 @@ struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
 
         fit(aux,data, np,0);
     }
+	
+MPI_Barrier(WORLD);
     else{
 	long np;
         MPI_Status status[2];
