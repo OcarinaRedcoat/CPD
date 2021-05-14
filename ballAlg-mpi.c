@@ -244,13 +244,16 @@ count++;
     long aux2=0;
     for(long i=0;i<size;i++){
         if(orth_aux[i][0]<node->center[0]){
-
-            ret1[aux1]= (dataset[i]);
+		for(int j=0;j<n_dim;j++){
+            	ret1[aux1][j]= (dataset[i][j]);
+		}
             aux1++;
         }
 
         else{
-            ret2[aux2]=(dataset[i]);
+            for(int j=0;j<n_dim;j++){
+            	ret2[aux2][j]= (dataset[i][j]);
+		}
             aux2++;
         }
     }
