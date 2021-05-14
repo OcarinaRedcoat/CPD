@@ -103,7 +103,7 @@ double inner(double *a, double *b)
     return ret;
 }
 
-double *median_center(double **orth_aux, long size)
+double *median_center(double **orth_aux, long size, int num_threads)
 {
 
     double *_orth = (double *)malloc(n_dim * size * sizeof(double));
@@ -234,7 +234,7 @@ void fit(struct tree *node, double **dataset, long size, long id,int threads)
             }
         }
 
-        node->center = median_center(orth_aux, size);
+        node->center = median_center(orth_aux, size,threads);
 
         node->rad = rad(dataset, node->center, size);
 
