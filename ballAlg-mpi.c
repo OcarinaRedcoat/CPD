@@ -257,7 +257,7 @@ count++;
             aux2++;
         }
     }
-//free(dataset[0]);
+    free(dataset[0]);
     free(dataset);
     free(_orth_aux);
     free(orth_aux);
