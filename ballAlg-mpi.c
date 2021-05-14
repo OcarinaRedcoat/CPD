@@ -392,7 +392,7 @@ while (rank < nprocs) {
        fflush (stdout);
    }
    rank ++;
-   MPI_Barrier ();
+   MPI_Barrier (WORLD);
 }
 
   MPI_Finalize();
