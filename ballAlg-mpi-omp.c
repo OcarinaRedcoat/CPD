@@ -102,7 +102,7 @@ double *median_center(double **orth_aux, long size, int num_threads)
         }
     }
 
-    my_qsort(orth, 0, size-1,num_threads);
+    my_qsort(orth, 0, size-1);
 
     double *ret = (double *)malloc(n_dim * sizeof(double));
 
