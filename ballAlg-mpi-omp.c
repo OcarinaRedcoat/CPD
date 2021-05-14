@@ -4,6 +4,8 @@
 
 #include <mpi.h>
 
+#include <omp.h>
+
 #include "gen_points.c"
 
 #define WORLD MPI_COMM_WORLD
@@ -343,7 +345,7 @@ int main(int argc, char *argv[])
 
     if (me == 0)
     {
-        print("threads: %d", allThreads);
+        printf("threads: %d", allThreads);
         long np = atol(argv[2]);
 
         exec_time = -MPI_Wtime();
