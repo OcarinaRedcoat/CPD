@@ -284,9 +284,9 @@ void fit(struct tree *node, double **dataset, long size, long id,int threads)
         else if(threads>1){
             
 #pragma omp task
-    fit(node->L,ret1,aux1,2*id+1,num_threads/2);
+    fit(node->L,ret1,aux1,2*id+1,threads/2);
 #pragma omp task
-    fit(node->R,ret2,aux2,2*id+2,num_threads-num_threads/2);
+    fit(node->R,ret2,aux2,2*id+2,threads-threads/2);
             
         }
         else
