@@ -329,19 +329,21 @@ int main(int argc, char *argv[])
     int me;
     double exec_time;
     long global_count;
+    int provided=0;
 
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
     MPI_Comm_rank(MPI_COMM_WORLD, &me);
-
+    MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
     struct tree *aux = (struct tree *)malloc(sizeof(struct tree));
-
+    int allThreads = omp_get_max_threads();
     n_dim = atoi(argv[1]);
 
     MPI_Bcast(&n_dim, 1, MPI_LONG, 0, WORLD);
 
     if (me == 0)
     {
+        print("threads: %d", allThreads);
         long np = atol(argv[2]);
 
         exec_time = -MPI_Wtime();
