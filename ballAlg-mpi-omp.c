@@ -370,6 +370,7 @@ int main(int argc, char *argv[])
 
     if (me == 0)
     {
+        printf("%d",allThreads);
         long np = atol(argv[2]);
 
         exec_time = -MPI_Wtime();
@@ -404,7 +405,6 @@ int main(int argc, char *argv[])
 
     if (me == 0)
     {
-
         exec_time += MPI_Wtime();
         fprintf(stderr, "%.1lf\n", exec_time);
         printf("%d %ld \n", n_dim, global_count);
