@@ -236,12 +236,12 @@ count++;
     for(long i=0;i<size;i++){
         if(orth_aux[i][0]<node->center[0]){
 
-            ret1[aux1]= dataset[i];
+            ret1[aux1]= &(dataset[i]);
             aux1++;
         }
 
         else{
-            ret2[aux2]=dataset[i];
+            ret2[aux2]=&(dataset[i]);
             aux2++;
         }
     }
@@ -355,9 +355,6 @@ struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
             data[i] = &_data[i * n_dim];
 
         MPI_Recv(&(data[0][0]),np*n_dim,MPI_DOUBLE,MPI_ANY_SOURCE,2,WORLD, &status[1]);
-	    for(long i=0;i<np;i++){
-		printf("%lf  %lf \n",data[i][0],data[i][1]);
-	}
         fit(aux,data,np,me*2);
     }
     
