@@ -257,6 +257,7 @@ count++;
             aux2++;
         }
     }
+    free(dataset[0]);
     free(dataset);
     free(_orth_aux);
     free(orth_aux);
@@ -274,6 +275,8 @@ if(id<=nprocs-2){
     MPI_Send(&aux2,1,MPI_LONG,(id+1),1,WORLD);
     //ret
     MPI_Send(&(ret2[0][0]),aux2*n_dim,MPI_DOUBLE,(id+1),2,WORLD);
+	free(ret2[0]);
+	free(ret2);
     fit(node->L,ret1,aux1,2*id+1);
 
 
