@@ -139,7 +139,7 @@ double rad(double **data, double *center, long data_size)
     return sqrt(ret);
 }
 
-void fit(struct tree *node, double **dataset, long size, long id)
+void fit(struct tree *node, double **dataset, long size, long id,int threads)
 {
     node->id = id;
     count++;
@@ -281,6 +281,14 @@ void fit(struct tree *node, double **dataset, long size, long id)
             free(ret2);
             fit(node->L, ret1, aux1, 2 * id + 1);
         }
+        else if(threads>=1){
+            
+#pragma omp task
+    fit(node->L,ret1,aux1,2*id+1,num_threads/2);
+#pragma omp task
+    fit(node->R,ret2,aux2,2*id+2,num_threads-num_threads/2);
+            
+        }
         else
         {
 
@@ -348,9 +356,12 @@ int main(int argc, char *argv[])
         long np = atol(argv[2]);
 
         exec_time = -MPI_Wtime();
-        double **data = get_points(argc, argv, &n_dim, &np);
-
+        double **data = get_points(argc, argv, &n_dim, &np,allThreads);
+    #pragma omp parallel
+  #pragma omp single
         fit(aux, data, np, 0);
+             #pragma omp taskwait
+
     }
     else
     {
@@ -363,7 +374,11 @@ int main(int argc, char *argv[])
             data[i] = &_data[i * n_dim];
 
         MPI_Recv(&(data[0][0]), np * n_dim, MPI_DOUBLE, MPI_ANY_SOURCE, 2, WORLD, &status[1]);
-        fit(aux, data, np, (long)me * 2);
+        #pragma omp parallel
+  #pragma omp single
+        fit(aux, data, np, (long)me * 2,allThreads);
+             #pragma omp taskwait
+
     }
 
     MPI_Barrier(WORLD);
