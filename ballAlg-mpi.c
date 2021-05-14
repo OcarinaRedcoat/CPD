@@ -349,7 +349,7 @@ struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
         MPI_Status status[2];
         MPI_Recv(&np,1,MPI_LONG,MPI_ANY_SOURCE,1,WORLD, &status[0]);
 	double *_data = (double *) malloc(n_dim * np * sizeof(double));
-        double data = (double **) malloc(np * sizeof(double *));
+        double **data = (double **) malloc(np * sizeof(double *));
         for(long i = 0; i < np; i++)
             data[i] = &_data[i * n_dim];
 
