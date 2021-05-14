@@ -82,18 +82,6 @@ double eucl(double *aux1, double *aux2){
 }
 
 
-double eucl(double *aux1, double *aux2){
-    double ret=0.0;
-    double aux=0.0;
-
-    for(int i=0; i < n_dim; i++){
-        aux=aux1[i]-aux2[i];
-        ret+= aux*aux;
-    }
-    return ret;
-}
-
-
 struct tree
 {
     double *center;
