@@ -269,7 +269,7 @@ count++;
 if(id<=nprocs-2){
     node->R->id=2*id+2;
     //to the tranverse function not print this node
-    node->R->rad=-1;
+    node->R->rad=(double) -1;
     //aux
     MPI_Send(&aux2,1,MPI_LONG,(id+1),1,WORLD);
     //ret
