@@ -359,7 +359,7 @@ struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
     }
 	
 MPI_Barrier(WORLD);
-    else{
+    if(me!=0){
 	long np;
         MPI_Status status[2];
         MPI_Recv(&np,1,MPI_LONG,MPI_ANY_SOURCE,1,WORLD, &status[0]);
