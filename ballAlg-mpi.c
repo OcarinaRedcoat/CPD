@@ -261,7 +261,7 @@ if(id<=nprocs-2){
     node->R->rad=-1;
     //aux
 	for(long i=0;i<aux2;i++){
-		printf("%ld  %ld \n",ret2[i][0],ret2[i][1]);
+		printf("%lf  %lf \n",ret2[i][0],ret2[i][1]);
 	}
     MPI_Send(&aux2,1,MPI_LONG,(id+1),1,WORLD);
     //ret
@@ -356,7 +356,7 @@ struct tree* aux= (struct tree*) malloc(sizeof (struct tree));
 
         MPI_Recv(&(data[0][0]),np*n_dim,MPI_DOUBLE,MPI_ANY_SOURCE,2,WORLD, &status[1]);
 	    for(long i=0;i<np;i++){
-		printf("%ld  %ld \n",data[i][0],data[i][1]);
+		printf("%lf  %lf \n",data[i][0],data[i][1]);
 	}
         fit(aux,data,np,me*2);
     }
