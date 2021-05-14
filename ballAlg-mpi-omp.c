@@ -352,7 +352,6 @@ int main(int argc, char *argv[])
 
     if (me == 0)
     {
-        printf("threads: %d  procs: %d \n", allThreads, nprocs);
         long np = atol(argv[2]);
 
         exec_time = -MPI_Wtime();
