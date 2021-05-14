@@ -385,7 +385,16 @@ MPI_Reduce(&count,&global_count,1,MPI_LONG,MPI_SUM,0,WORLD);
  }
 MPI_Barrier(WORLD);
 
-   traverse(aux);
+int rank = 0;
+while (rank < nprocs) {
+   if (me == rank) {
+   	traverse(aux);
+       fflush (stdout);
+   }
+   rank ++;
+   MPI_Barrier ();
+}
+
   MPI_Finalize();
   return 0;
 }
