@@ -157,7 +157,7 @@ double rad(double **data, double *center, long data_size)
     return sqrt(ret);
 }
 
-void fit(struct tree *node, double **dataset, long size, long id,int threads)
+void fit(struct tree *node, double **dataset, long size, long id,int threads,int distributed)
 {
     node->id = id;
     #pragma omp atomic
@@ -286,8 +286,13 @@ void fit(struct tree *node, double **dataset, long size, long id,int threads)
 
         node->L = (struct tree *)malloc(sizeof(struct tree));
         node->R = (struct tree *)malloc(sizeof(struct tree));
-
-        if (id <= nprocs - 2)
+        
+        if(distributed==0){
+            fit(node->L, ret1, aux1, 2 * id + 1,1,0);
+            fit(node->R, ret2, aux2, 2 * id + 2,1,0);
+        }
+        else{
+        if (id <= nprocs - 2 )
         {
             node->R->id = 2 * id + 2;
             //to the tranverse function not print this node
@@ -298,14 +303,14 @@ void fit(struct tree *node, double **dataset, long size, long id,int threads)
             MPI_Send(&(ret2[0][0]), aux2 * n_dim, MPI_DOUBLE, (id + 1), 2, WORLD);
             free(ret2[0]);
             free(ret2);
-            fit(node->L, ret1, aux1, 2 * id + 1,threads);
+            fit(node->L, ret1, aux1, 2 * id + 1,threads,1);
         }
         else if(threads>1){
             
 #pragma omp task
-    fit(node->L,ret1,aux1,2*id+1,threads/2);
+    fit(node->L,ret1,aux1,2*id+1,threads/2,1);
 #pragma omp task
-    fit(node->R,ret2,aux2,2*id+2,threads-threads/2);
+    fit(node->R,ret2,aux2,2*id+2,threads-threads/2,1);
             
         }
         else
@@ -315,6 +320,7 @@ void fit(struct tree *node, double **dataset, long size, long id,int threads)
             fit(node->R, ret2, aux2, 2 * id + 2,1);
         }
     }
+   }
 }
 
 void visit(struct tree *node)
@@ -365,7 +371,7 @@ int main(int argc, char *argv[])
     struct tree *aux = (struct tree *)malloc(sizeof(struct tree));
     int allThreads = omp_get_max_threads();
     n_dim = atoi(argv[1]);
-    if(atol(argv[2])<10000){
+    if(atol(argv[2])<8*nprocs){
         if (me == 0)
         {
         printf("%d",allThreads);
@@ -373,8 +379,8 @@ int main(int argc, char *argv[])
 
         exec_time = -MPI_Wtime();
         double **data = get_points(argc, argv, &n_dim, &np);
-  
-        fit(aux, data, np, 4 096,1);
+  // in order to avoid 
+        fit(aux, data, np, 0,1,0);
             
             
             
@@ -401,7 +407,7 @@ int main(int argc, char *argv[])
         double **data = get_points(argc, argv, &n_dim, &np);
     #pragma omp parallel
   #pragma omp single
-        fit(aux, data, np, 0,allThreads);
+        fit(aux, data, np, 0,allThreads,1);
              #pragma omp taskwait
 
     }
@@ -418,7 +424,7 @@ int main(int argc, char *argv[])
         MPI_Recv(&(data[0][0]), np * n_dim, MPI_DOUBLE, MPI_ANY_SOURCE, 2, WORLD, &status[1]);
         #pragma omp parallel
   #pragma omp single
-        fit(aux, data, np, (long)me * 2,allThreads);
+        fit(aux, data, np, (long)me * 2,allThreads,1);
              #pragma omp taskwait
 
     }
