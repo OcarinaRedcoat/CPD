@@ -374,7 +374,6 @@ int main(int argc, char *argv[])
     if(atol(argv[2])<8*nprocs){
         if (me == 0)
         {
-        printf("%d",allThreads);
         long np = atol(argv[2]);
 
         exec_time = -MPI_Wtime();
@@ -400,7 +399,6 @@ int main(int argc, char *argv[])
 
     if (me == 0)
     {
-        printf("%d",allThreads);
         long np = atol(argv[2]);
 
         exec_time = -MPI_Wtime();
