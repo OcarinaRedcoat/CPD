@@ -365,7 +365,31 @@ int main(int argc, char *argv[])
     struct tree *aux = (struct tree *)malloc(sizeof(struct tree));
     int allThreads = omp_get_max_threads();
     n_dim = atoi(argv[1]);
+    if(atol(argv[2])<10000){
+        if (me == 0)
+        {
+        printf("%d",allThreads);
+        long np = atol(argv[2]);
 
+        exec_time = -MPI_Wtime();
+        double **data = get_points(argc, argv, &n_dim, &np);
+  
+        fit(aux, data, np, 4 096,1);
+            
+            
+            
+        exec_time += MPI_Wtime();
+        fprintf(stderr, "%.1lf\n", exec_time);
+        printf("%d %ld \n", n_dim, count);
+        fflush(stdout);
+        traverse(aux);
+
+             
+
+        }
+    }
+    else{
+        
     MPI_Bcast(&n_dim, 1, MPI_LONG, 0, WORLD);
 
     if (me == 0)
@@ -423,7 +447,7 @@ int main(int argc, char *argv[])
         rank++;
         MPI_Barrier(WORLD);
     }
-
+    }
     MPI_Finalize();
     return 0;
 }
