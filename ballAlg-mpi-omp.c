@@ -316,8 +316,8 @@ void fit(struct tree *node, double **dataset, long size, long id,int threads,int
         else
         {
 
-            fit(node->L, ret1, aux1, 2 * id + 1,1);
-            fit(node->R, ret2, aux2, 2 * id + 2,1);
+            fit(node->L, ret1, aux1, 2 * id + 1,1,1);
+            fit(node->R, ret2, aux2, 2 * id + 2,1,1);
         }
     }
    }
