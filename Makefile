@@ -6,7 +6,7 @@ MPISOURCE = ballAlg-mpi.c
 MPITARGET = ballAlg-mpi
 CC = gcc
 MPICC = mpicc
-MPIGLAGS = -lm
+MPIGLAGS = -fopenmp -O3 -lm
 FLAGS = -fopenmp -O3 -lm
 
 all: ballAlg
