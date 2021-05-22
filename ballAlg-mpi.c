@@ -378,7 +378,7 @@ int main(int argc, char *argv[])
 
         exec_time = -MPI_Wtime();
         double **data = get_points(argc, argv, &n_dim, &np);
-  // in order to avoid 
+
         fit(aux, data, np, 0,1,0);
             
             
